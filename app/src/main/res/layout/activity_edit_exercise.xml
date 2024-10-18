@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="@drawable/background_vector">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        android:elevation="4dp" />
+
+    <!-- Title for Edit Exercise -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit Exercise"
+        android:textSize="30sp"
+        android:layout_marginBottom="24dp"
+        android:textStyle="bold" />
+
+    <!-- Exercise Name Input -->
+    <EditText
+        android:id="@+id/edit_exercise_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Exercise Name"
+        android:background="@drawable/rounded_edittext"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp" />
+
+
+    <!-- Focus Area Input -->
+    <EditText
+        android:id="@+id/edit_focus_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Focus Area"
+        android:background="@drawable/rounded_edittext"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp" />
+
+    <!-- Equipment Input -->
+    <EditText
+        android:id="@+id/edit_equipment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Equipment"
+        android:background="@drawable/rounded_edittext"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp" />
+
+    <!-- Preparation Input -->
+    <EditText
+        android:id="@+id/edit_preparation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Preparation Steps"
+        android:background="@drawable/rounded_edittext"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp" />
+
+    <!-- Execution Input -->
+    <EditText
+        android:id="@+id/edit_execution"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Execution Steps"
+        android:background="@drawable/rounded_edittext"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp" />
+
+    <!-- Save Exercise Button -->
+    <Button
+        android:id="@+id/btn_save_exercise"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save Exercise"
+        android:background="@color/colorAccent"
+        android:textColor="@android:color/white"
+        android:padding="16dp"
+        android:textSize="18sp" />
+
+    <!-- Progress Bar for Uploading -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp" />
+</LinearLayout>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="@drawable/background_vector">
+
+    <!-- Workout Name Text -->
+    <TextView
+        android:id="@+id/workout_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Workout Details Text -->
+    <TextView
+        android:id="@+id/workout_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Focus Area Text -->
+    <TextView
+        android:id="@+id/focus_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Focus Area: "
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Equipment Text -->
+    <TextView
+        android:id="@+id/equipment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Equipment: "
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Preparation Text -->
+    <TextView
+        android:id="@+id/preparation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Preparation: "
+        android:textSize="16sp"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Edit and Delete Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/edit_button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Edit"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColor="@android:color/white"
+            android:padding="16dp"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/delete_button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Delete"
+            android:backgroundTint="@android:color/darker_gray"
+            android:textColor="@android:color/white"
+            android:padding="16dp"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+</LinearLayout>

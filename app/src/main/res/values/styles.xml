@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- res/values/styles.xml -->
+    <style name="MyButton" parent="Widget.MaterialComponents.Button">
+        <!-- Disable default background and ripple effect -->
+        <item name="backgroundTint">@null</item>
+        <item name="rippleColor">@null</item>
+    </style>
+
+
+</resources>

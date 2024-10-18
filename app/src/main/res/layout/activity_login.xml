@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/background_vector"
+    tools:context=".LoginActivity">
+
+    <!-- ImageView for Gym Logo -->
+
+    <!-- TextView for heading -->
+
+    <ImageView
+        android:id="@+id/gymrat_logo"
+        android:layout_width="87dp"
+        android:layout_height="86dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="24dp"
+        android:contentDescription="Gymrat_Logo"
+        android:src="@drawable/gymrat_logo_background"
+        android:visibility="invisible" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LOGIN"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        android:textColor="#000"
+        android:layout_gravity="left"
+        android:paddingBottom="24dp" />
+
+    <!-- Relative Layout for email field -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp">
+
+        <!-- Mail Icon -->
+        <ImageView
+            android:id="@+id/mailIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="0dp"
+            android:contentDescription="Mail Icon"
+            android:padding="12dp"
+            android:src="@drawable/ic_mail" />
+
+        <!-- Edit text for email -->
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/mailIcon"
+            android:layout_marginBottom="1dp"
+            android:background="@drawable/rounded_edittext"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:padding="12dp"
+            android:textColor="#3100d4"
+            android:textColorHint="#978cbd" />
+
+
+    </RelativeLayout>
+
+    <!-- RelativeLayout for password field with visibility toggle -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp">
+
+        <!-- Lock Icon -->
+        <ImageView
+            android:id="@+id/lockIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="0dp"
+            android:contentDescription="Lock Icon"
+            android:padding="12dp"
+            android:src="@drawable/ic_lock" />
+
+        <!-- Edit text for password -->
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/lockIcon"
+            android:layout_marginEnd="1dp"
+            android:layout_marginRight="-49dp"
+            android:layout_toLeftOf="@id/passwordToggle"
+            android:background="@drawable/rounded_edittext"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textColor="#3100d4"
+            android:textColorHint="#978cbd" />
+
+        <!-- ImageView for password visibility toggle -->
+
+        <ImageView
+            android:id="@+id/passwordToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="2dp"
+            android:contentDescription="Password Icon"
+            android:padding="12dp"
+            android:src="@drawable/ic_eye_closed" />
+
+    </RelativeLayout>
+
+    <!-- Button for Login with text "Login" -->
+    <Button
+        android:id="@+id/login"
+        style="@style/MyButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:textSize="16sp"
+        android:textColor="#fff"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button_gradient"
+        android:padding="5dp"
+        app:cornerRadius="10dp" />
+
+
+    <!-- Button for Register with text "Register" -->
+    <Button
+        android:id="@+id/register"
+        style="@style/MyButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:textSize="16sp"
+        android:textColor="#fff"
+        android:padding="5dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button_gradient"
+        app:cornerRadius="10dp" />
+
+
+    <!-- TextView for Forgot Password link -->
+    <Button
+        android:id="@+id/resetPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#fff"
+        android:text="Forgot Password?"
+        android:textColor="#3100d4"
+        android:textSize="14sp" />
+
+    <!-- ProgressBar for Loading Time -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="-40dp"
+        android:visibility="invisible" />
+
+</LinearLayout>

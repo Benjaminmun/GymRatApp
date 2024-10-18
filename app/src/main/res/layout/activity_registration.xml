@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/background_vector"
+    tools:context=".RegistrationActivity">
+
+    <!-- ImageView for logo -->
+
+    <!-- TextView for heading -->
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="24dp"
+        android:contentDescription="App logo"
+        android:src="@drawable/gymrat_logo_background"
+        android:visibility="invisible" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:paddingBottom="24dp"
+        android:text="REGISTER"
+        android:textColor="#000"
+        android:textSize="48sp"
+        android:textStyle="bold" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:id="@+id/mailIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="0dp"
+            android:contentDescription="Mail Icon"
+            android:padding="12dp"
+            android:src="@drawable/ic_mail" />
+
+        <!-- Edit text for email -->
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/mailIcon"
+            android:layout_marginBottom="1dp"
+            android:background="@drawable/rounded_edittext"
+            android:hint="Enter Email"
+            android:inputType="textEmailAddress"
+            android:padding="12dp"
+            android:textColor="#3100d4"
+            android:textColorHint="#978cbd" />
+
+    </RelativeLayout>
+    <!-- Edit text for confirm email -->
+
+    <!-- RelativeLayout for password field with visibility toggle -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <!-- Lock Icon -->
+        <ImageView
+            android:id="@+id/lockIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="0dp"
+            android:contentDescription="Lock Icon"
+            android:padding="12dp"
+            android:src="@drawable/ic_lock" />
+
+        <!-- Edit text for password -->
+        <EditText
+            android:id="@+id/passwd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/lockIcon"
+            android:layout_marginEnd="1dp"
+            android:layout_marginRight="-49dp"
+            android:layout_toLeftOf="@id/passwordToggle"
+            android:background="@drawable/rounded_edittext"
+            android:hint="Enter Password"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textColor="#3100d4"
+            android:textColorHint="#978cbd" />
+
+        <ImageView
+            android:id="@+id/passwordToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="4dp"
+            android:contentDescription="Toggle password visibility"
+            android:padding="12dp"
+            android:src="@drawable/ic_eye_closed" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/passwordStrengthTextView"
+        android:layout_width="269dp"
+        android:layout_height="wrap_content"
+        android:paddingLeft="49dp"
+        android:paddingBottom="10dp"
+        android:text="Password Strength"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp">
+
+        <!-- Lock and Checkmark Icon -->
+        <ImageView
+            android:id="@+id/lockCheckIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="0dp"
+            android:contentDescription="Lock Check Icon"
+            android:padding="12dp"
+            android:src="@drawable/ic_lock" />
+
+        <!-- Edit text for confirm password -->
+
+        <EditText
+            android:id="@+id/confirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/lockCheckIcon"
+            android:layout_marginEnd="1dp"
+            android:layout_marginRight="-49dp"
+            android:layout_toLeftOf="@id/confirmPasswordToggle"
+            android:background="@drawable/rounded_edittext"
+            android:hint="Confirm Password"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textColor="#3100d4"
+            android:textColorHint="#978cbd" />
+
+        <ImageView
+            android:id="@+id/confirmPasswordToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="4dp"
+            android:contentDescription="Toggle confirm password visibility"
+            android:padding="12dp"
+            android:src="@drawable/ic_eye_closed" />
+
+    </RelativeLayout>
+
+    <!-- ProgressBar for loading time -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:id="@+id/passwordConfirmMatch"
+            android:layout_width="269dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="49dp"
+            android:paddingBottom="0dp"
+            android:text="Password does not match"
+            android:textColor="@android:color/holo_red_dark"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btnregister"
+        style="@style/MyButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:textSize="16sp"
+        android:background="@drawable/button_gradient"
+        android:textColor="#fff"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"
+        app:cornerRadius="10dp" />
+
+    <Button
+        android:id="@+id/backToLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="1dp"
+        android:backgroundTint="#fff"
+        android:text="Already have an account? Back to Login"
+        android:textColor="#3100d4"
+        android:textSize="14sp" />
+
+    <!-- ProgressBar for Loading Time -->
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="-40dp"
+        android:visibility="invisible" />
+
+</LinearLayout>

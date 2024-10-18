@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="Home"
+        android:icon="@drawable/ic_home_24"
+        android:id="@+id/home" />
+
+    <item
+        android:title="Training"
+        android:icon="@drawable/ic_training"
+        android:id="@+id/training" />
+
+    <item
+        android:title="Exercise"
+        android:icon="@drawable/ic_exercise"
+        android:id="@+id/exercise" />
+
+    <item
+        android:title="Reports"
+        android:icon="@drawable/ic_report"
+        android:id="@+id/report" />
+
+    <item
+        android:title="Profile"
+        android:icon="@drawable/ic_me"
+        android:id="@+id/profile" />
+</menu>
