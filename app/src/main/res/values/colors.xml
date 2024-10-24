@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color> <!-- Black Color -->
+    <color name="white">#FFFFFFFF</color> <!-- White Color -->
+
+    <color name="your_background_color">#3100d4</color> <!-- Custom Background Color -->
+    <color name="your_icon_color">#FFFFFF</color> <!-- Icon Color -->
+    <color name="your_text_color">#FFFFFF</color> <!-- Text Color -->
+    <color name="colorPrimary">#FF000000</color>
+    <color name="colorAccent">#E30000</color> <!-- Set colorPrimary to Black -->
+</resources>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "745658799248",
+    "project_id": "gymratnew-ead7f",
+    "storage_bucket": "gymratnew-ead7f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:745658799248:android:3128202845d7c7dab43415",
+        "android_client_info": {
+          "package_name": "student.inti.gymratdev3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7adkcV-bbR73m4_xlD965l01JvNXG7FE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

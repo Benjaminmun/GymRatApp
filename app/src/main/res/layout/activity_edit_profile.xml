@@ -1,0 +1,269 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp"
+        android:background="@drawable/background_vector_compact"
+        tools:context=".ChangePasswordActivity">
+
+
+        <!-- Toolbar at the top -->
+
+        <!-- Title Text -->
+
+        <!-- Profile Picture ImageView -->
+        <ImageView
+            android:id="@+id/profile_image_view"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/circle_background"
+            android:contentDescription="Profile Picture"
+            android:padding="18dp"
+            android:src="@drawable/ic_profile_placeholder" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <!-- Camera icon ImageButton to upload profile picture -->
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:elevation="0dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                app:navigationIcon="@drawable/ic_back"
+                app:titleTextColor="#fff" />
+
+            <TextView
+                android:id="@+id/edit_profile_title"
+                android:layout_width="154dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="120dp"
+                android:layout_marginTop="20dp"
+                android:paddingBottom="5dp"
+                android:text="Edit Profile"
+                android:textColor="#000"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/btn_upload_picture"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="300dp"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="Upload Profile Picture"
+                android:src="@drawable/ic_camera" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp">
+
+            <!-- Username Icon -->
+            <ImageView
+                android:id="@+id/usernameIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="0dp"
+                android:contentDescription="Username Icon"
+                android:padding="12dp"
+                android:src="@drawable/ic_username" />
+
+            <!-- Input field for Username -->
+            <EditText
+                android:id="@+id/edit_username"
+                android:layout_width="359dp"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/usernameIcon"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_edittext"
+                android:hint="Username"
+                android:inputType="text"
+                android:minHeight="48dp"
+                android:padding="12dp"
+                android:textColor="#3100d4"
+                android:textColorHint="#978cbd"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp">
+
+            <!-- Mail Icon -->
+            <ImageView
+                android:id="@+id/mailIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="0dp"
+                android:contentDescription="Mail Icon"
+                android:padding="12dp"
+                android:src="@drawable/ic_mail" />
+
+
+            <!-- Input field for Height -->
+            <EditText
+                android:id="@+id/edit_email"
+                android:layout_width="376dp"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/mailIcon"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_edittext"
+                android:hint="Email"
+                android:inputType="textEmailAddress"
+                android:minHeight="48dp"
+                android:padding="12dp"
+                android:textColor="#3100d4"
+                android:textColorHint="#978cbd"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp">
+
+            <!-- Cake Icon -->
+            <ImageView
+                android:id="@+id/cakeIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="0dp"
+                android:contentDescription="Cake Icon"
+                android:padding="12dp"
+                android:src="@drawable/ic_cake" />
+
+            <!-- Input field for Birthday -->
+            <EditText
+                android:id="@+id/edit_birthday"
+                android:layout_width="391dp"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/cakeIcon"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_edittext"
+                android:focusable="false"
+                android:hint="Birthday (YYYY-MM-DD)"
+                android:inputType="none"
+                android:minHeight="48dp"
+                android:padding="12dp"
+                android:textColor="#3100d4"
+                android:textColorHint="#978cbd"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp">
+
+            <!-- Height Icon -->
+            <ImageView
+                android:id="@+id/heightIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="0dp"
+                android:contentDescription="Height Icon"
+                android:padding="12dp"
+                android:src="@drawable/ic_height" />
+
+            <EditText
+                android:id="@+id/edit_height"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/heightIcon"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_edittext"
+                android:hint="Height (CM)"
+                android:inputType="numberDecimal"
+                android:padding="12dp"
+                android:minHeight="48dp"
+                android:textColor="#3100d4"
+                android:textColorHint="#978cbd"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp">
+
+            <!-- Weight Icon -->
+            <ImageView
+                android:id="@+id/weightIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="0dp"
+                android:contentDescription="Weight Icon"
+                android:padding="12dp"
+                android:src="@drawable/ic_weight" />
+
+            <!-- Input field for Weight -->
+            <EditText
+                android:id="@+id/edit_weight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/weightIcon"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/rounded_edittext"
+                android:hint="Weight (KG)"
+                android:inputType="numberDecimal"
+                android:padding="12dp"
+                android:minHeight="48dp"
+                android:textColor="#3100d4"
+                android:textColorHint="#978cbd"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+        <!-- Button to Save Changes -->
+        <Button
+            android:id="@+id/btn_save_changes"
+            style="@style/MyButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Changes"
+            android:textSize="18sp"
+            android:textColor="#fff"
+            android:background="@drawable/button_gradient"
+            android:padding="14dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- ProgressBar for Saving Changes -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:visibility="invisible" />
+
+    </LinearLayout>
+</ScrollView>
