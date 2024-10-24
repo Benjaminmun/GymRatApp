@@ -16,8 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="2dp">
 
-        <!-- Filter Icon Button -->
-
+        <!-- Search EditText -->
         <EditText
             android:id="@+id/search_edit_text"
             android:layout_width="match_parent"
@@ -35,6 +34,7 @@
             android:textColorHint="#978cbd"
             android:textSize="16sp" />
 
+        <!-- Filter Icon Button -->
         <ImageButton
             android:id="@+id/filter_icon_button"
             android:layout_width="wrap_content"
@@ -47,66 +47,139 @@
             android:layout_marginBottom="16dp" />
     </RelativeLayout>
 
-    <!-- Filter Buttons (Initially Hidden) -->
-    <LinearLayout
-        android:id="@+id/filter_buttons_container"
+    <!-- Scrollable Filter Buttons (Initially Hidden) -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        android:background="@drawable/rounded_edittext"
-        android:padding="5dp"
         android:layout_marginBottom="16dp"
-        android:gravity="center">
+        android:visibility="gone"
+        android:id="@+id/filter_buttons_scrollview">
 
-        <Button
-            android:id="@+id/arms_category_button"
-            style="@style/MyButton"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+        <LinearLayout
+            android:id="@+id/filter_buttons_container"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Arms"
-            android:textColor="#fff"
-            android:background="@drawable/button_gradient"
-            android:layout_marginEnd="8dp" />
+            android:orientation="vertical"
+            android:background="@drawable/rounded_edittext"
+            android:padding="5dp"
+            android:gravity="center">
 
-        <Button
-            android:id="@+id/back_category_button"
-            style="@style/MyButton"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Back"
-            android:textColor="#fff"
-            android:background="@drawable/button_gradient"
-            android:layout_marginEnd="8dp" />
+            <!-- First Row: Arms, Back, Olympic, All -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/olympic_category_button"
-            style="@style/MyButton"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Olympic"
-            android:textSize="10dp"
-            android:textColor="#fff"
-            android:background="@drawable/button_gradient"
-            android:layout_marginEnd="8dp" />
+                <Button
+                    android:id="@+id/arms_category_button"
+                    style="@style/MyButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Arms"
+                    android:textColor="#fff"
+                    android:background="@drawable/button_gradient"
+                    android:layout_marginEnd="8dp" />
 
-        <Button
-            android:id="@+id/filter_all_button"
-            style="@style/MyButton"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="All"
-            android:background="@drawable/button_gradient"
-            android:textColor="#fff"/>
-    </LinearLayout>
+                <Button
+                    android:id="@+id/back_category_button"
+                    style="@style/MyButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Back"
+                    android:textColor="#fff"
+                    android:background="@drawable/button_gradient"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/olympic_category_button"
+                    style="@style/MyButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Olympic"
+                    android:textSize="10dp"
+                    android:textColor="#fff"
+                    android:background="@drawable/button_gradient"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/filter_all_button"
+                    style="@style/MyButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="All"
+                    android:background="@drawable/button_gradient"
+                    android:textColor="#fff"/>
+            </LinearLayout>
+
+            <!-- Second Row: Chest, Core, Glutes, Shoulders, Legs -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <Button
+                    android:id="@+id/chest_category_button"
+                    style="@style/MyButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Chest"
+                    android:textColor="#fff"
+                    android:background="@drawable/button_gradient"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/core_category_button"
+                    style="@style/MyButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Core"
+                    android:textColor="#fff"
+                    android:background="@drawable/button_gradient"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/glutes_category_button"
+                    style="@style/MyButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Glutes"
+                    android:textColor="#fff"
+                    android:background="@drawable/button_gradient"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/shoulder_category_button"
+                    style="@style/MyButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Shoulders"
+                    android:textColor="#fff"
+                    android:background="@drawable/button_gradient"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/leg_category_button"
+                    style="@style/MyButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Legs"
+                    android:textColor="#fff"
+                    android:background="@drawable/button_gradient" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <!-- Scrollable Container for Workout Buttons -->
-
-    <!-- Add Exercise Button -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -120,6 +193,7 @@
             android:orientation="vertical" />
     </ScrollView>
 
+    <!-- Add Exercise Button -->
     <Button
         android:id="@+id/add_exercise_button"
         style="@style/MyButton"
@@ -136,12 +210,4 @@
         android:drawableEnd="@drawable/ic_add"
         android:drawablePadding="8dp" />
 
-<!--    &lt;!&ndash; Favorite Button &ndash;&gt;-->
-<!--    <ImageButton-->
-<!--        android:id="@+id/favorites_button"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="?attr/selectableItemBackgroundBorderless"-->
-<!--        android:src="@drawable/ic_favorite"-->
-<!--        android:layout_gravity="end" />-->
 </LinearLayout>

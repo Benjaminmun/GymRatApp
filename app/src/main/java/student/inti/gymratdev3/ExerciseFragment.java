@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.text.Editable;
@@ -20,31 +21,38 @@ import android.text.TextWatcher;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ExerciseFragment extends Fragment {
 
-    private Button filterArmsButton, filterBackButton, filterOlympicButton, filterAllButton, addExerciseButton;
+    private Button filterArmsButton, filterBackButton, filterOlympicButton, filterLegButton,
+            filterChestButton, filterCoreButton, filterGlutesButton, filterShouldersButton,
+            filterAllButton, addExerciseButton;
     private LinearLayout workoutContainer, filterButtonsContainer;
     private FirebaseFirestore db;
     private String userId;
+    private ImageButton filterIconButton;
+    private ScrollView filterButtonsScrollView;
+    private boolean isFilterVisible = false; // Tracks the visibility of the filter buttons
 
     // Maps to store default workouts for different categories
     private final Map<String, Workout> defaultArmsWorkouts = new HashMap<>();
     private final Map<String, Workout> defaultBackWorkouts = new HashMap<>();
     private final Map<String, Workout> defaultOlympicWorkouts = new HashMap<>();
-
+    private final Map<String, Workout> defaultLegWorkouts = new HashMap<>();
+    private final Map<String, Workout> defaultChestWorkouts = new HashMap<>();
+    private final Map<String, Workout> defaultCoreWorkouts = new HashMap<>();
+    private final Map<String, Workout> defaultGlutesWorkouts = new HashMap<>();
+    private final Map<String, Workout> defaultShouldersWorkouts = new HashMap<>();
 
     public ExerciseFragment() {
         // Required empty public constructor
@@ -56,7 +64,13 @@ public class ExerciseFragment extends Fragment {
 
         // Initialize Firestore and User ID
         db = FirebaseFirestore.getInstance();
-        userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            userId = user.getUid();
+        } else {
+            Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+            // Handle user not logged in appropriately
+        }
 
         initializeUI(view); // Initialize all UI elements
         initializeDefaultWorkouts(); // Initialize default workout data
@@ -74,19 +88,39 @@ public class ExerciseFragment extends Fragment {
         loadAllWorkouts();
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Initialize views
+        filterIconButton = view.findViewById(R.id.filter_icon_button);
+
+
+        // Set click listener for filter button
+        filterIconButton.setOnClickListener(v -> {
+            // Toggle visibility and update state
+            isFilterVisible = !isFilterVisible;
+            filterButtonsScrollView.setVisibility(isFilterVisible ? View.VISIBLE : View.GONE);
+        });
+    }
 
     private void initializeUI(View view) {
         // Bind all UI elements
         filterArmsButton = view.findViewById(R.id.arms_category_button);
         filterBackButton = view.findViewById(R.id.back_category_button);
         filterOlympicButton = view.findViewById(R.id.olympic_category_button);
+        filterLegButton = view.findViewById(R.id.leg_category_button);
+        filterChestButton = view.findViewById(R.id.chest_category_button);
+        filterCoreButton = view.findViewById(R.id.core_category_button);
+        filterGlutesButton = view.findViewById(R.id.glutes_category_button);
+        filterShouldersButton = view.findViewById(R.id.shoulder_category_button);
         filterAllButton = view.findViewById(R.id.filter_all_button);
         workoutContainer = view.findViewById(R.id.workout_container);
         filterButtonsContainer = view.findViewById(R.id.filter_buttons_container);
         ImageButton filterIconButton = view.findViewById(R.id.filter_icon_button);
         addExerciseButton = view.findViewById(R.id.add_exercise_button);
+        filterButtonsScrollView = view.findViewById(R.id.filter_buttons_scrollview);
         EditText searchEditText = view.findViewById(R.id.search_edit_text);
-
 
         // Show/Hide filter buttons on clicking the filter icon
         filterIconButton.setOnClickListener(v -> toggleFilterVisibility());
@@ -113,6 +147,7 @@ public class ExerciseFragment extends Fragment {
 
     private void initializeDefaultWorkouts() {
         // Populate default workouts for Arms, Back, Olympic categories
+
         // Arms Workouts
         defaultArmsWorkouts.put("Bicep Curl with Dumbbell", new Workout(
                 "Biceps, Forearms",
@@ -138,7 +173,6 @@ public class ExerciseFragment extends Fragment {
                 "1. Squeeze your biceps to bend your elbows and curl the rope up...\n" +
                         "2. Return to the starting position slowly and repeat."
         ));
-
 
         // Back Workouts
         defaultBackWorkouts.put("Bent-over Row (Reverse Grip) Barbell", new Workout(
@@ -173,24 +207,60 @@ public class ExerciseFragment extends Fragment {
                 "1. Drive your hips up and straighten your legs to pull the barbell...\n" +
                         "2. As you lift the barbell, lower your hips to a front squat position..."
         ));
+
+        // Chest Workouts
+        defaultChestWorkouts.put("Bench Press", new Workout(
+                "Chest, Triceps",
+                "Barbell",
+                "Lie back on a bench with a barbell in an overhand grip...",
+                "1. Lower the barbell until it touches your chest...\n" +
+                        "2. Press the bar back up to the starting position."
+        ));
+
+        defaultChestWorkouts.put("Chest Fly", new Workout(
+                "Chest, Shoulders",
+                "Dumbbell",
+                "Lie back on a bench with dumbbells in each hand...",
+                "1. Lower the dumbbells to the side with a slight bend in your elbows...\n" +
+                        "2. Squeeze your chest and bring the dumbbells back up."
+        ));
+
+        defaultCoreWorkouts.put("Plank", new Workout(
+                "Core",
+                "Bodyweight",
+                "Lie face down on the floor, supporting your body with your forearms and toes...",
+                "1. Keep your core tight and hold the position...\n" +
+                        "2. Hold for as long as possible."
+        ));
+
+        defaultGlutesWorkouts.put("Glute Bridge", new Workout(
+                "Glutes, Core",
+                "Bodyweight",
+                "Lie on your back with knees bent and feet flat on the floor...",
+                "1. Squeeze your glutes and lift your hips towards the ceiling...\n" +
+                        "2. Lower back down and repeat."
+        ));
+
+        defaultShouldersWorkouts.put("Shoulder Press", new Workout(
+                "Shoulders",
+                "Dumbbell",
+                "Sit on a bench with dumbbells in each hand at shoulder height...",
+                "1. Press the dumbbells overhead until your arms are straight...\n" +
+                        "2. Lower back to the starting position."
+        ));
     }
 
     private void setupFilterListeners() {
-        // Setup filter button listeners for different workout categories
+        // Setup filter button listeners to filter workouts by category
+        filterArmsButton.setOnClickListener(v -> filterWorkoutsByCategory("Arms", defaultArmsWorkouts));
+        filterBackButton.setOnClickListener(v -> filterWorkoutsByCategory("Back", defaultBackWorkouts));
+        filterOlympicButton.setOnClickListener(v -> filterWorkoutsByCategory("Olympic", defaultOlympicWorkouts));
+        filterLegButton.setOnClickListener(v -> filterWorkoutsByCategory("Legs", defaultLegWorkouts));
+        filterChestButton.setOnClickListener(v -> filterWorkoutsByCategory("Chest", defaultChestWorkouts));
+        filterCoreButton.setOnClickListener(v -> filterWorkoutsByCategory("Core", defaultCoreWorkouts));
+        filterGlutesButton.setOnClickListener(v -> filterWorkoutsByCategory("Glutes", defaultGlutesWorkouts));
+        filterShouldersButton.setOnClickListener(v -> filterWorkoutsByCategory("Shoulders", defaultShouldersWorkouts));
         filterAllButton.setOnClickListener(v -> loadAllWorkouts());
-
-        filterArmsButton.setOnClickListener(v -> {
-            Log.d("Filter", "Default Arms Workouts size: " + defaultArmsWorkouts.size());
-            filterWorkoutsByCategory("Arms", defaultArmsWorkouts);
-        });
-
-        filterBackButton.setOnClickListener(v -> {
-            filterWorkoutsByCategory("Back", defaultBackWorkouts); // Filter Back workouts (both default and user-created)
-        });
-
-        filterOlympicButton.setOnClickListener(v -> {
-            filterWorkoutsByCategory("Olympic", defaultOlympicWorkouts); // Filter Olympic workouts (both default and user-created)
-        });
     }
 
 
@@ -208,7 +278,13 @@ public class ExerciseFragment extends Fragment {
         addWorkoutCategory("Arms", defaultArmsWorkouts);
         addWorkoutCategory("Back", defaultBackWorkouts);
         addWorkoutCategory("Olympic", defaultOlympicWorkouts);
+        addWorkoutCategory("Leg", defaultLegWorkouts);
+        addWorkoutCategory("Chest", defaultChestWorkouts);
+        addWorkoutCategory("Core", defaultCoreWorkouts);
+        addWorkoutCategory("Glutes", defaultGlutesWorkouts);
+        addWorkoutCategory("Shoulders", defaultShouldersWorkouts);
     }
+
 
     private void filterWorkoutsByCategory(String category, Map<String, Workout> defaultWorkouts) {
         workoutContainer.removeAllViews(); // Clear the container
@@ -251,7 +327,7 @@ public class ExerciseFragment extends Fragment {
 
     private void addDefaultWorkoutsToCategory(String category, Map<String, Workout> defaultWorkouts) {
         // Add a label for the category
-        TextView categoryLabel = addCategoryLabel(category.toUpperCase() + " EXERCISES");
+        TextView categoryLabel = addCategoryLabel(category.toUpperCase() + " WORKOUTS");
         categoryLabel.setTextColor(Color.parseColor("#3100d4")); // Hardcoded text color
         categoryLabel.setTypeface(null, Typeface.BOLD); // Make text bold
         categoryLabel.setGravity(Gravity.CENTER); // Center the text
@@ -274,7 +350,7 @@ public class ExerciseFragment extends Fragment {
                         Log.d("Firestore", "Query returned: " + task.getResult().size() + " documents"); // Log result size
 
                         // Add a label for user workouts if any are found
-                        TextView userCategoryLabel = addCategoryLabel("USER " + category.toUpperCase() + " EXERCISES");
+                        TextView userCategoryLabel = addCategoryLabel("USER " + category.toUpperCase() + " WORKOUTS");
                         userCategoryLabel.setTextColor(Color.parseColor("#FF4500"));
                         userCategoryLabel.setTypeface(null, Typeface.BOLD);
                         userCategoryLabel.setGravity(Gravity.CENTER);
@@ -307,37 +383,6 @@ public class ExerciseFragment extends Fragment {
             addWorkoutButton(entry.getKey(), entry.getValue());
         }
     }
-
-//    private void fetchAndAddUserWorkouts(String category) {
-//        // Remove existing user workouts and labels before adding new ones
-//        removeExistingUserWorkouts();
-//
-//        // Fetch user workouts filtered by category from Firestore
-//        db.collection("users").document(userId).collection("custom_exercises")
-//                .whereEqualTo("category", category).get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-//                        // Add new category label for user workouts
-//                        TextView userCategoryLabel = addCategoryLabel("USER " + category.toUpperCase() + " WORKOUTS");
-//                        userCategoryLabel.setTextColor(Color.parseColor("#FF4500"));
-//                        userCategoryLabel.setTypeface(null, Typeface.BOLD);
-//                        userCategoryLabel.setGravity(Gravity.CENTER);
-//
-//                        // Add each workout button under the corresponding category
-//                        for (QueryDocumentSnapshot document : task.getResult()) {
-//                            addUserWorkoutButton(document.getString("exercise_name"),
-//                                    new String[]{document.getString("execution"),
-//                                            document.getString("focus_area"),
-//                                            document.getString("equipment"),
-//                                            document.getString("preparation")});
-//                        }
-//                    } else if (task.getException() != null) {
-//                        Log.e("Firestore", "Failed to fetch user exercises", task.getException());
-//                        Toast.makeText(getActivity(), "Error loading exercises.", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//
-//    }
 
 
     private TextView addCategoryLabel(String text) {
@@ -489,31 +534,6 @@ public class ExerciseFragment extends Fragment {
                 });
     }
 
-
-
-
-//    private void removeExistingUserWorkouts() {
-//        // Loop through the workout container and remove user workout buttons
-//        int childCount = workoutContainer.getChildCount();
-//        for (int i = childCount - 1; i >= 0; i--) {
-//            View view = workoutContainer.getChildAt(i);
-//            // Assuming user workouts have a specific background (button_gradient_alternate_orange), remove only those views
-//            if (view instanceof Button && ((Button) view).getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.button_gradient_alternate_orange).getConstantState())) {
-//                workoutContainer.removeView(view);
-//            }
-//        }
-//    }
-//
-//
-//    private boolean containsSearchQuery(String query, Map<String, Workout> workouts) {
-//        for (String workoutName : workouts.keySet()) {
-//            if (workoutName.toLowerCase().contains(query.toLowerCase())) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
     private Map<String, Workout> filterWorkouts(Map<String, Workout> workouts, String query) {
         Map<String, Workout> filteredWorkouts = new HashMap<>();
         for (Map.Entry<String, Workout> entry : workouts.entrySet()) {
@@ -523,5 +543,7 @@ public class ExerciseFragment extends Fragment {
         }
         return filteredWorkouts;
     }
+
+
 
 }

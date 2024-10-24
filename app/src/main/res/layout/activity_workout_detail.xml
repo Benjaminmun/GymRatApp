@@ -27,8 +27,8 @@
         android:id="@+id/execution_heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="EXECUTION "
-        android:textSize="18sp"
+        android:text="Execution: "
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="#3100d4"
         android:layout_marginBottom="5dp" />
@@ -46,8 +46,8 @@
         android:id="@+id/focus_area_heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="FOCUS AREA"
-        android:textSize="18sp"
+        android:text="Focus Area: "
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="#3100d4"
         android:layout_marginBottom="5dp" />
@@ -67,9 +67,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:text="EQUIPMENT"
+        android:text="Equipment: "
         android:textColor="#3100d4"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         />
 
@@ -86,8 +86,8 @@
         android:id="@+id/preparation_heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="PREPARATION"
-        android:textSize="18sp"
+        android:text="Preparation: "
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="#3100d4"
         android:layout_marginBottom="5dp" />

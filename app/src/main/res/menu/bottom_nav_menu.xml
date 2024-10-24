@@ -12,12 +12,12 @@
         android:id="@+id/training" />
 
     <item
-        android:title="Exercises"
+        android:title="Exercise"
         android:icon="@drawable/ic_exercise"
         android:id="@+id/exercise" />
 
     <item
-        android:title="Report"
+        android:title="Reports"
         android:icon="@drawable/ic_report"
         android:id="@+id/report" />
 
