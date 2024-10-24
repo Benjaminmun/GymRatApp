@@ -1,56 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="24dp"
     android:gravity="center"
-    android:background="@drawable/background_vector">
+    android:background="@drawable/background_vector_compact">
+
 
     <!-- Workout Name Text -->
+
     <TextView
-        android:id="@+id/workout_name"
+            android:id="@+id/workout_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:textColor="@android:color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+    <!-- Execution Area Text -->
+    <TextView
+        android:id="@+id/execution_heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Execution: "
+        android:textSize="16sp"
         android:textStyle="bold"
-        android:textSize="24sp"
-        android:layout_marginBottom="16dp" />
+        android:textColor="#3100d4"
+        android:layout_marginBottom="5dp" />
 
-    <!-- Workout Details Text -->
     <TextView
-        android:id="@+id/workout_details"
+        android:id="@+id/execution"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:layout_marginBottom="24dp" />
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="20dp" />
 
     <!-- Focus Area Text -->
     <TextView
-        android:id="@+id/focus_area"
+        android:id="@+id/focus_area_heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Focus Area: "
         android:textSize="16sp"
-        android:layout_marginBottom="8dp" />
+        android:textStyle="bold"
+        android:textColor="#3100d4"
+        android:layout_marginBottom="5dp" />
+
+    <TextView
+        android:id="@+id/focus_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="20dp" />
 
     <!-- Equipment Text -->
+
+    <TextView
+        android:id="@+id/equipment_heading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:text="Equipment: "
+        android:textColor="#3100d4"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        />
+
     <TextView
         android:id="@+id/equipment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Equipment: "
         android:textSize="16sp"
-        android:layout_marginBottom="8dp" />
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="20dp" />
 
     <!-- Preparation Text -->
     <TextView
-        android:id="@+id/preparation"
+        android:id="@+id/preparation_heading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Preparation: "
         android:textSize="16sp"
-        android:layout_marginBottom="24dp" />
+        android:textStyle="bold"
+        android:textColor="#3100d4"
+        android:layout_marginBottom="5dp" />
+
+    <TextView
+        android:id="@+id/preparation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="20dp" />
 
     <!-- Edit and Delete Buttons -->
     <LinearLayout
@@ -61,24 +109,38 @@
 
         <Button
             android:id="@+id/edit_button"
+            style="@style/MyButton"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="Edit"
-            android:backgroundTint="@color/colorPrimary"
+            android:background="@drawable/button_gradient"
             android:textColor="@android:color/white"
             android:padding="16dp"
             android:layout_marginEnd="8dp" />
 
         <Button
             android:id="@+id/delete_button"
+            style="@style/MyButton"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="Delete"
-            android:backgroundTint="@android:color/darker_gray"
+            android:background="@drawable/button_red_gradient"
             android:textColor="@android:color/white"
             android:padding="16dp"
             android:layout_marginStart="8dp" />
     </LinearLayout>
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:layout_marginLeft="100dp"
+        android:elevation="0dp"
+        android:layout_marginBottom="-90dp"
+        android:paddingTop="16dp"
+        app:navigationIcon="@drawable/ic_back"
+        app:titleTextColor="#fff" />
 </LinearLayout>

@@ -7,12 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class TrainingFragment extends Fragment {
+public class TimerTrainingActivity extends Fragment {
 
     private TextView timerTextView;
     private Button startButton, pauseButton, resumeButton, nextWorkoutButton;
+    private ProgressBar progressBar;
 
     private long startTime = 0L;
     private long timeInMilliseconds = 0L;
@@ -24,18 +26,18 @@ public class TrainingFragment extends Fragment {
     private Runnable countdownRunnable;
 
     private boolean isRunning = false;
-    private boolean isPaused = false;
     private int countdownTime = 3; // 3 seconds countdown
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_training, container, false);
+        View view = inflater.inflate(R.layout.activity_training_timer, container, false);
 
         timerTextView = view.findViewById(R.id.timerTextView);
         startButton = view.findViewById(R.id.startButton);
         pauseButton = view.findViewById(R.id.pauseButton);
         resumeButton = view.findViewById(R.id.resumeButton);
         nextWorkoutButton = view.findViewById(R.id.nextWorkoutButton);
+        progressBar = view.findViewById(R.id.progressbar);
 
         handler = new Handler();
 
@@ -65,10 +67,11 @@ public class TrainingFragment extends Fragment {
             public void run() {
                 if (countdownTime > 0) {
                     timerTextView.setText(String.valueOf(countdownTime));
+                    progressBar.setProgress(3 - countdownTime);  // Update progress bar
                     countdownTime--;
                     handler.postDelayed(this, 1000); // Countdown every second
                 } else {
-                    // Start the actual timer after countdown
+                    progressBar.setVisibility(View.GONE);  // Hide ProgressBar after countdown
                     startTimer();
                 }
             }
@@ -78,9 +81,13 @@ public class TrainingFragment extends Fragment {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isRunning && !isPaused) {
+                if (!isRunning) {
                     countdownTime = 3; // Reset countdown time
+                    progressBar.setMax(3);  // Set progress bar max
+                    progressBar.setVisibility(View.VISIBLE);
                     handler.postDelayed(countdownRunnable, 0);
+                    updateButtonState(false, true, false);
+                    isRunning = true;
                 }
             }
         });
@@ -92,8 +99,8 @@ public class TrainingFragment extends Fragment {
                 if (isRunning) {
                     timeBuff += timeInMilliseconds; // Accumulate elapsed time
                     handler.removeCallbacks(timerRunnable); // Stop timer updates
+                    updateButtonState(false, false, true);  // Enable Resume
                     isRunning = false; // Mark timer as not running
-                    isPaused = true; // Mark the timer as paused
                 }
             }
         });
@@ -102,11 +109,11 @@ public class TrainingFragment extends Fragment {
         resumeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isPaused) {
-                    startTime = System.currentTimeMillis(); // Set start time to current
-                    handler.postDelayed(timerRunnable, 0); // Resume the timer updates
-                    isRunning = true; // Mark the timer as running
-                    isPaused = false; // Reset paused state
+                if (!isRunning) {
+                    startTime = System.currentTimeMillis() - timeBuff; // Set start time for resume
+                    handler.postDelayed(timerRunnable, 0); // Start the timer again
+                    updateButtonState(false, true, false);
+                    isRunning = true; // Mark timer as running
                 }
             }
         });
@@ -122,15 +129,15 @@ public class TrainingFragment extends Fragment {
         return view;
     }
 
+    // Method to start the timer
     private void startTimer() {
         startTime = System.currentTimeMillis(); // Initialize start time
         handler.postDelayed(timerRunnable, 0); // Start updating the timer
         isRunning = true; // Mark timer as running
-        isPaused = false; // Clear paused state if any
     }
 
+    // Method to reset the timer for next workout
     private void resetTimer() {
-        // Reset Timer and move to the next workout
         timeBuff = 0L;
         timeInMilliseconds = 0L;
         updatedTime = 0L;
@@ -138,7 +145,14 @@ public class TrainingFragment extends Fragment {
         handler.removeCallbacks(timerRunnable); // Stop the timer
         handler.removeCallbacks(countdownRunnable); // Stop countdown if running
         isRunning = false; // Reset running state
-        isPaused = false; // Reset paused state
         countdownTime = 3; // Reset countdown time
+        updateButtonState(true, false, false); // Reset button states
+    }
+
+    // Method to manage button states
+    private void updateButtonState(boolean startEnabled, boolean pauseEnabled, boolean resumeEnabled) {
+        startButton.setEnabled(startEnabled);
+        pauseButton.setEnabled(pauseEnabled);
+        resumeButton.setEnabled(resumeEnabled);
     }
 }

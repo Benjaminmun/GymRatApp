@@ -1,104 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center"
-    android:background="@drawable/background_vector">
+    android:fillViewport="true"
+    tools:context=".EditExerciseActivity">
 
-    <!-- Toolbar -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        android:elevation="4dp" />
-
-    <!-- Title for Edit Exercise -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Edit Exercise"
-        android:textSize="30sp"
-        android:layout_marginBottom="24dp"
-        android:textStyle="bold" />
-
-    <!-- Exercise Name Input -->
-    <EditText
-        android:id="@+id/edit_exercise_name"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Exercise Name"
-        android:background="@drawable/rounded_edittext"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp"
-        android:textSize="16sp" />
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="@drawable/background_vector_white"
+        android:gravity="center">
+
+        <!-- Title for Editing Exercise -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit Exercise"
+            android:textColor="#000"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Exercise Name Input -->
+        <LinearLayout
+            android:id="@+id/exercise_name_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Exercise Name"
+                android:textSize="16sp"
+                android:textColor="#3100d4"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/edit_exercise_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter exercise name"
+                android:background="@drawable/rounded_edittext"
+                android:padding="12dp"
+                android:minHeight="48dp"
+                android:textSize="16sp"
+                android:textColor="#3100d4"
+                android:textColorHint="#978cbd" />
+        </LinearLayout>
+
+        <!-- Execution Input -->
+        <LinearLayout
+            android:id="@+id/execution_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Execution (Steps)"
+                android:textSize="16sp"
+                android:textColor="#3100d4"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/edit_execution"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter execution (steps)"
+                android:background="@drawable/rounded_edittext"
+                android:inputType="textMultiLine"
+                android:padding="12dp"
+                android:minHeight="48dp"
+                android:textSize="16sp"
+                android:textColor="#3100d4"
+                android:textColorHint="#978cbd" />
+        </LinearLayout>
+
+        <!-- Focus Area Input -->
+        <LinearLayout
+            android:id="@+id/focus_area_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Focus Area"
+                android:textSize="16sp"
+                android:textColor="#3100d4"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/edit_focus_area"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="e.g. Chest, Triceps"
+                android:background="@drawable/rounded_edittext"
+                android:padding="12dp"
+                android:minHeight="48dp"
+                android:textSize="16sp"
+                android:textColor="#3100d4"
+                android:textColorHint="#978cbd" />
+        </LinearLayout>
+
+        <!-- Equipment Input -->
+        <LinearLayout
+            android:id="@+id/equipment_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Equipment"
+                android:textSize="16sp"
+                android:textColor="#3100d4"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/edit_equipment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="e.g. Bench, Dumbbells"
+                android:background="@drawable/rounded_edittext"
+                android:padding="12dp"
+                android:minHeight="48dp"
+                android:textSize="16sp"
+                android:textColor="#3100d4"
+                android:textColorHint="#978cbd" />
+        </LinearLayout>
+
+        <!-- Preparation Input -->
+        <LinearLayout
+            android:id="@+id/preparation_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Preparation"
+                android:textSize="16sp"
+                android:textColor="#3100d4"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/edit_preparation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter preparation"
+                android:background="@drawable/rounded_edittext"
+                android:padding="12dp"
+                android:minHeight="48dp"
+                android:textSize="16sp"
+                android:textColor="#3100d4"
+                android:textColorHint="#978cbd" />
+        </LinearLayout>
 
 
-    <!-- Focus Area Input -->
-    <EditText
-        android:id="@+id/edit_focus_area"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Focus Area"
-        android:background="@drawable/rounded_edittext"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp"
-        android:textSize="16sp" />
 
-    <!-- Equipment Input -->
-    <EditText
-        android:id="@+id/edit_equipment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Equipment"
-        android:background="@drawable/rounded_edittext"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp"
-        android:textSize="16sp" />
+        <!-- Save and Cancel Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
 
-    <!-- Preparation Input -->
-    <EditText
-        android:id="@+id/edit_preparation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Preparation Steps"
-        android:background="@drawable/rounded_edittext"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp"
-        android:textSize="16sp" />
+            <Button
+                android:id="@+id/btn_save_exercise"
+                style="@style/MyButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:background="@drawable/button_gradient"
+                android:textColor="@android:color/white"
+                android:padding="16dp"
+                android:layout_marginEnd="8dp" />
 
-    <!-- Execution Input -->
-    <EditText
-        android:id="@+id/edit_execution"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Execution Steps"
-        android:background="@drawable/rounded_edittext"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp"
-        android:textSize="16sp" />
+            <Button
+                android:id="@+id/cancel_button"
+                style="@style/MyButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Cancel"
+                android:background="@drawable/button_red_gradient"
+                android:textColor="@android:color/white"
+                android:padding="16dp"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
 
-    <!-- Save Exercise Button -->
-    <Button
-        android:id="@+id/btn_save_exercise"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Save Exercise"
-        android:background="@color/colorAccent"
-        android:textColor="@android:color/white"
-        android:padding="16dp"
-        android:textSize="18sp" />
-
-    <!-- Progress Bar for Uploading -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp" />
-</LinearLayout>
+        <!-- ProgressBar for loading feedback -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp" />
+    </LinearLayout>
+</ScrollView>

@@ -2,4 +2,42 @@
     <string name="app_name">GymRatDev3</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Focus Area options -->
+    <string-array name="focus_areas">
+        <item>Arms</item>
+        <item>Back</item>
+        <item>Legs</item>
+        <item>Core</item>
+        <item>Full Body</item>
+    </string-array>
+
+    <!-- Equipment options -->
+    <string-array name="equipment_options">
+        <item>Barbell</item>
+        <item>Dumbbells</item>
+        <item>Bodyweight</item>
+        <item>Resistance Bands</item>
+        <item>Machine</item>
+    </string-array>
+
+    <!-- Category options -->
+    <string-array name="category_options">
+        <item>Olympic</item>
+        <item>Strength</item>
+        <item>Endurance</item>
+        <item>Cardio</item>
+        <item>Flexibility</item>
+    </string-array>
+
+    <string-array name="exercise_categories">
+        <item>Arms</item>
+        <item>Back</item>
+        <item>Olympic</item>
+    </string-array>
+
+    <!-- Accessibility strings -->
+    <string name="description_reset_button">Reset the exercise form</string>
+    <string name="description_save_button">Save the exercise</string>
+    <string name="description_cancel_button">Cancel the action</string>
 </resources>
