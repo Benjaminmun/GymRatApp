@@ -47,7 +47,7 @@
             android:layout_marginBottom="16dp" />
     </RelativeLayout>
 
-    <!-- Scrollable Filter Buttons (Initially Hidden) -->
+    <!-- Horizontal Scrollable Filter Buttons -->
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
             android:padding="5dp"
             android:gravity="center">
 
-            <!-- All Buttons in a Single Row: Arms, Back, Olympic, All, Chest, Core, Glutes, Shoulders, Legs -->
+            <!-- Arms Button -->
             <Button
                 android:id="@+id/arms_category_button"
                 style="@style/MyButton"
@@ -75,6 +75,7 @@
                 android:background="@drawable/button_gradient"
                 android:layout_marginEnd="8dp" />
 
+            <!-- Back Button -->
             <Button
                 android:id="@+id/back_category_button"
                 style="@style/MyButton"
@@ -85,6 +86,7 @@
                 android:background="@drawable/button_gradient"
                 android:layout_marginEnd="8dp" />
 
+            <!-- Olympic Button -->
             <Button
                 android:id="@+id/olympic_category_button"
                 style="@style/MyButton"
@@ -96,6 +98,7 @@
                 android:background="@drawable/button_gradient"
                 android:layout_marginEnd="8dp" />
 
+            <!-- All Button -->
             <Button
                 android:id="@+id/filter_all_button"
                 style="@style/MyButton"
@@ -104,8 +107,9 @@
                 android:text="All"
                 android:background="@drawable/button_gradient"
                 android:textColor="#fff"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginEnd="8dp"/>
 
+            <!-- Additional Buttons for other categories -->
             <Button
                 android:id="@+id/chest_category_button"
                 style="@style/MyButton"

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -41,7 +42,7 @@ public class ExerciseFragment extends Fragment {
     private FirebaseFirestore db;
     private String userId;
     private ImageButton filterIconButton;
-    private ScrollView filterButtonsScrollView;
+    private HorizontalScrollView filterButtonsScrollView;
     private boolean isFilterVisible = false; // Tracks the visibility of the filter buttons
 
     // Maps to store default workouts for different categories
@@ -72,6 +73,7 @@ public class ExerciseFragment extends Fragment {
             // Handle user not logged in appropriately
         }
 
+
         initializeUI(view); // Initialize all UI elements
         initializeDefaultWorkouts(); // Initialize default workout data
         setupFilterListeners(); // Setup filter button listeners
@@ -79,6 +81,8 @@ public class ExerciseFragment extends Fragment {
 
         return view;
     }
+
+
 
     @Override
     public void onResume() {

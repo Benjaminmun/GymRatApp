@@ -1,0 +1,28 @@
+<!-- res/layout/activity_training_detail.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/add_exercise_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Exercises" />
+
+    <Button
+        android:id="@+id/remove_exercise_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Remove Exercises"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/start_workout_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Workout"
+        android:layout_marginTop="16dp" />
+</LinearLayout>

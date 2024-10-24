@@ -1,144 +1,140 @@
 package student.inti.gymratdev3;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import android.text.Editable;
+import android.text.TextWatcher;
 
 public class TrainingFragment extends Fragment {
 
-    private TextView timerTextView;
-    private Button startButton, pauseButton, resumeButton, nextWorkoutButton;
-
-    private long startTime = 0L;
-    private long timeInMilliseconds = 0L;
-    private long timeBuff = 0L;
-    private long updatedTime = 0L;
-
-    private Handler handler;
-    private Runnable timerRunnable;
-    private Runnable countdownRunnable;
-
-    private boolean isRunning = false;
-    private boolean isPaused = false;
-    private int countdownTime = 3; // 3 seconds countdown
+    private LinearLayout trainingContainer;
+    private Button addTrainingButton;
+    private FirebaseFirestore db;
+    private FirebaseUser currentUser;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_training, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_training, container, false);
 
-        timerTextView = view.findViewById(R.id.timerTextView);
-        startButton = view.findViewById(R.id.startButton);
-        pauseButton = view.findViewById(R.id.pauseButton);
-        resumeButton = view.findViewById(R.id.resumeButton);
-        nextWorkoutButton = view.findViewById(R.id.nextWorkoutButton);
+        // Initialize UI elements
+        trainingContainer = rootView.findViewById(R.id.training_container);
+        addTrainingButton = rootView.findViewById(R.id.add_training_button);
+        EditText searchEditText = rootView.findViewById(R.id.search_edit_text);
 
-        handler = new Handler();
+        // Initialize Firestore and get current user
+        db = FirebaseFirestore.getInstance();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        // Timer Runnable
-        timerRunnable = new Runnable() {
+        if (currentUser != null) {
+            // Load user-specific trainings from Firestore
+            loadUserTrainings(currentUser.getUid());
+        } else {
+            Toast.makeText(getContext(), "User not authenticated", Toast.LENGTH_SHORT).show();
+        }
+
+        // Add listener to the "Add Training" button
+        addTrainingButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), EditUserTrainingActivity.class);
+            intent.putExtra("TRAINING_NAME", "New User Training");
+            startActivity(intent);
+        });
+
+        // Implement search functionality
+        searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void run() {
-                timeInMilliseconds = System.currentTimeMillis() - startTime;
-                updatedTime = timeBuff + timeInMilliseconds;
-
-                int secs = (int) (updatedTime / 1000);
-                int mins = secs / 60;
-                int hrs = mins / 60;
-                secs = secs % 60;
-                int deciSecs = (int) (updatedTime % 1000) / 100; // Calculate deciseconds
-
-                // Update the timer text view to include deciseconds
-                timerTextView.setText(String.format("%02d:%02d:%02d.%d", hrs, mins % 60, secs, deciSecs));
-
-                handler.postDelayed(this, 100); // Update every 100ms for deciseconds
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not needed
             }
-        };
 
-        // Countdown Runnable
-        countdownRunnable = new Runnable() {
             @Override
-            public void run() {
-                if (countdownTime > 0) {
-                    timerTextView.setText(String.valueOf(countdownTime));
-                    countdownTime--;
-                    handler.postDelayed(this, 1000); // Countdown every second
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Filter trainings based on the input search query
+                filterTrainings(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Not needed
+            }
+        });
+
+        return rootView;
+    }
+
+    // Method to load user-specific trainings from Firestore
+    private void loadUserTrainings(String userId) {
+        db.collection("trainings")
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        trainingContainer.removeAllViews();  // Clear previous trainings
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String trainingName = document.getString("trainingName");
+                            addTrainingButtonToContainer(trainingName);
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Error loading trainings", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    // Method to add a training button to the container
+    private void addTrainingButtonToContainer(String trainingName) {
+        Button trainingButton = new Button(getContext());
+        trainingButton.setText(trainingName);
+        trainingButton.setBackgroundResource(R.drawable.button_gradient_alternate);
+
+        trainingButton.setTextColor(getResources().getColor(android.R.color.white));
+        trainingButton.setPadding(16, 16, 16, 16);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(16, 16, 16, 16);
+        trainingButton.setLayoutParams(params);
+
+        trainingButton.setTextSize(16);
+        trainingContainer.addView(trainingButton);
+
+        // Set onClickListener to open the TrainingDetailActivity when clicked
+        trainingButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), TrainingDetailActivity.class);
+            intent.putExtra("TRAINING_NAME", trainingName);
+            startActivity(intent);
+        });
+    }
+
+    // Method to filter displayed trainings based on search input
+    private void filterTrainings(String query) {
+        for (int i = 0; i < trainingContainer.getChildCount(); i++) {
+            View view = trainingContainer.getChildAt(i);
+            if (view instanceof Button) {
+                Button trainingButton = (Button) view;
+                String trainingName = trainingButton.getText().toString().toLowerCase();
+                if (trainingName.contains(query.toLowerCase())) {
+                    trainingButton.setVisibility(View.VISIBLE);
                 } else {
-                    // Start the actual timer after countdown
-                    startTimer();
+                    trainingButton.setVisibility(View.GONE);
                 }
             }
-        };
-
-        // Start Button
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!isRunning && !isPaused) {
-                    countdownTime = 3; // Reset countdown time
-                    handler.postDelayed(countdownRunnable, 0);
-                }
-            }
-        });
-
-        // Pause Button
-        pauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isRunning) {
-                    timeBuff += timeInMilliseconds; // Accumulate elapsed time
-                    handler.removeCallbacks(timerRunnable); // Stop timer updates
-                    isRunning = false; // Mark timer as not running
-                    isPaused = true; // Mark the timer as paused
-                }
-            }
-        });
-
-        // Resume Button
-        resumeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isPaused) {
-                    startTime = System.currentTimeMillis(); // Set start time to current
-                    handler.postDelayed(timerRunnable, 0); // Resume the timer updates
-                    isRunning = true; // Mark the timer as running
-                    isPaused = false; // Reset paused state
-                }
-            }
-        });
-
-        // Next Workout Button
-        nextWorkoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetTimer();
-            }
-        });
-
-        return view;
-    }
-
-    private void startTimer() {
-        startTime = System.currentTimeMillis(); // Initialize start time
-        handler.postDelayed(timerRunnable, 0); // Start updating the timer
-        isRunning = true; // Mark timer as running
-        isPaused = false; // Clear paused state if any
-    }
-
-    private void resetTimer() {
-        // Reset Timer and move to the next workout
-        timeBuff = 0L;
-        timeInMilliseconds = 0L;
-        updatedTime = 0L;
-        timerTextView.setText("00:00:00.0"); // Reset display to initial state
-        handler.removeCallbacks(timerRunnable); // Stop the timer
-        handler.removeCallbacks(countdownRunnable); // Stop countdown if running
-        isRunning = false; // Reset running state
-        isPaused = false; // Reset paused state
-        countdownTime = 3; // Reset countdown time
+        }
     }
 }
