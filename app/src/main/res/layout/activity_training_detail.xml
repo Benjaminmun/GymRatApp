@@ -1,28 +1,103 @@
-<!-- res/layout/activity_training_detail.xml -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="24dp"
+    android:background="@drawable/background_vector_white"
+    tools:context=".TrainingDetailActivity">
 
-    <Button
-        android:id="@+id/add_exercise_button"
+    <!-- Add Exercise, Remove Exercise, and Start Workout Buttons -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Exercises" />
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
 
-    <Button
-        android:id="@+id/remove_exercise_button"
+        <!-- Add Exercise Button -->
+        <Button
+            android:id="@+id/add_exercise_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add Exercise"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button_gradient"
+            android:padding="16dp"
+            android:textSize="16sp"
+            android:drawableEnd="@drawable/ic_add"
+            android:drawablePadding="8dp"
+            android:elevation="4dp"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Remove Exercise Button -->
+        <Button
+            android:id="@+id/remove_exercise_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Remove Exercise"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button_gradient"
+            android:padding="16dp"
+            android:textSize="16sp"
+            android:drawableEnd="@drawable/ic_remove"
+            android:drawablePadding="8dp"
+            android:elevation="4dp"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <!-- Scrollable List of Exercises -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Remove Exercises"
-        android:layout_marginTop="16dp" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="16dp">
 
+        <LinearLayout
+            android:id="@+id/exercises_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="@drawable/rounded_edittext"
+            android:gravity="center_vertical">
+
+            <!-- Placeholder text when no exercises are available -->
+            <TextView
+                android:id="@+id/no_exercises_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No exercises available"
+                android:textSize="16sp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_gravity="center" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Start Workout Button -->
     <Button
         android:id="@+id/start_workout_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Start Workout"
-        android:layout_marginTop="16dp" />
+        android:layout_gravity="center"
+        android:background="@drawable/button_gradient"
+        android:textColor="@android:color/white"
+        android:padding="16dp"
+        android:textSize="18sp"
+        android:drawableEnd="@drawable/ic_play"
+        android:drawablePadding="8dp"
+        android:elevation="4dp"
+        android:layout_marginBottom="8dp" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_gravity="center" />
 </LinearLayout>

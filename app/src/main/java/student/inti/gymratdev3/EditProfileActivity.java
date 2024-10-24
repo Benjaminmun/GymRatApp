@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -47,7 +47,9 @@ public class EditProfileActivity extends AppCompatActivity {
     private FirebaseUser currentUser;
     private StorageReference storageReference;
     private Uri imageUri;
+    private FirebaseFirestore db;
     private static final int STORAGE_PERMISSION_CODE = 101;  // Request code for storage permission
+    private boolean isDatePickerOpen = false;  // Flag to prevent multiple date picker dialogs
 
     @SuppressLint("WrongViewCast")
     @Override
@@ -61,10 +63,11 @@ public class EditProfileActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(android.graphics.Color.parseColor("#3100d4"));
         }
 
-        // Initialize Firebase Auth and Storage reference
+        // Initialize Firebase Auth, Firestore, and Storage reference
         firebaseAuth = FirebaseAuth.getInstance();
         currentUser = firebaseAuth.getCurrentUser();
         storageReference = FirebaseStorage.getInstance().getReference("profile_pictures");
+        db = FirebaseFirestore.getInstance();
 
         // Set up the Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -102,7 +105,11 @@ public class EditProfileActivity extends AppCompatActivity {
 
         // Set the birthday field to open the DatePickerDialog when clicked
         editBirthday.setFocusable(false);
-        editBirthday.setOnClickListener(v -> showDatePickerDialog());
+        editBirthday.setOnClickListener(v -> {
+            if (!isDatePickerOpen) {
+                showDatePickerDialog();
+            }
+        });
 
         // Set click listener for the Upload Picture button
         uploadPictureButton.setOnClickListener(v -> requestStoragePermission());
@@ -136,10 +143,14 @@ public class EditProfileActivity extends AppCompatActivity {
         }
     }
 
-
     // Method to load user data from Firestore
     private void loadUserData() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        if (currentUser == null) {
+            Toast.makeText(this, "User not authenticated.", Toast.LENGTH_SHORT).show();
+            finish();  // Return to previous activity
+            return;
+        }
+
         db.collection("users").document(currentUser.getUid())
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -195,29 +206,11 @@ public class EditProfileActivity extends AppCompatActivity {
         String height = editHeight.getText().toString().trim();
         String weight = editWeight.getText().toString().trim();
 
-        // Validate input
-        if (TextUtils.isEmpty(username)) {
-            editUsername.setError("Username is required");
-            return;
-        }
 
-        if (TextUtils.isEmpty(birthday)) {
-            editBirthday.setError("Birthday is required");
-            return;
-        }
-
-        if (TextUtils.isEmpty(height)) {
-            editHeight.setError("Height is required");
-            return;
-        }
-
-        if (TextUtils.isEmpty(weight)) {
-            editWeight.setError("Weight is required");
-            return;
-        }
-
-        // Show ProgressBar while saving
+        // Show ProgressBar while saving and disable buttons
         progressBar.setVisibility(View.VISIBLE);
+        saveChangesButton.setEnabled(false);
+        uploadPictureButton.setEnabled(false);
 
         // Upload profile picture if selected, then save user data
         if (imageUri != null) {
@@ -229,42 +222,55 @@ public class EditProfileActivity extends AppCompatActivity {
                     }))
                     .addOnFailureListener(e -> {
                         progressBar.setVisibility(View.INVISIBLE);
-                        Toast.makeText(EditProfileActivity.this, "Image upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        saveChangesButton.setEnabled(true);
+                        uploadPictureButton.setEnabled(true);
+                        Toast.makeText(EditProfileActivity.this, "Error uploading image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         } else {
-            saveToDatabase(username, birthday, height, weight, null);
+            saveToDatabase(username, birthday, height, weight, null);  // Save without updating the profile picture
         }
     }
 
-    // Save user data to Firebase Firestore
+    // Method to save data to Firestore
     private void saveToDatabase(String username, String birthday, String height, String weight, String imageUrl) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("username", username);
-        userData.put("birthday", birthday);
-        userData.put("height", height);
-        userData.put("weight", weight);
+        Map<String, Object> userUpdates = new HashMap<>();
+        userUpdates.put("username", username);
+        userUpdates.put("birthday", birthday);
+        userUpdates.put("height", height);
+        userUpdates.put("weight", weight);
         if (imageUrl != null) {
-            userData.put("profilePictureUrl", imageUrl);
+            userUpdates.put("profilePictureUrl", imageUrl);
         }
 
         db.collection("users").document(currentUser.getUid())
-                .set(userData, SetOptions.merge())
+                .set(userUpdates, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> {
-                    progressBar.setVisibility(View.INVISIBLE);
-                    Toast.makeText(EditProfileActivity.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                    // Update UI directly
+                    editUsername.setText(username);
+                    editBirthday.setText(birthday);
+                    editHeight.setText(height);
+                    editWeight.setText(weight);
+                    if (imageUrl != null) {
+                        Glide.with(this).load(imageUrl).into(profileImageView);
+                    }
 
-                    // Load updated user data
-                    loadUserData();  // Fetch and display the latest data
+                    progressBar.setVisibility(View.INVISIBLE);
+                    saveChangesButton.setEnabled(true);
+                    uploadPictureButton.setEnabled(true);
+
+                    Toast.makeText(EditProfileActivity.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     progressBar.setVisibility(View.INVISIBLE);
-                    Toast.makeText(EditProfileActivity.this, "Failed to update profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    saveChangesButton.setEnabled(true);
+                    uploadPictureButton.setEnabled(true);
+                    Toast.makeText(EditProfileActivity.this, "Error updating profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
-    // Show DatePickerDialog to select the birthday
+    // Method to show DatePicker dialog
     private void showDatePickerDialog() {
+        isDatePickerOpen = true;
         DatePickerDialog datePickerDialog = new DatePickerDialog(EditProfileActivity.this,
                 (view, year, month, dayOfMonth) -> {
                     calendar.set(Calendar.YEAR, year);
@@ -272,10 +278,11 @@ public class EditProfileActivity extends AppCompatActivity {
                     calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                     String selectedDate = dayOfMonth + "/" + (month + 1) + "/" + year;
                     editBirthday.setText(selectedDate);
-                },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH));
+                    isDatePickerOpen = false;
+                }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
+        // Reset the flag when dialog is dismissed
+        datePickerDialog.setOnDismissListener(dialog -> isDatePickerOpen = false);
         datePickerDialog.show();
     }
 }

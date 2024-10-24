@@ -1,35 +1,65 @@
-<!-- res/layout/activity_edit_user_training.xml -->
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="24dp"
+    android:background="@drawable/background_vector_white"
+    tools:context=".EditUserTrainingActivity">
 
+    <!-- Training Name Input -->
     <EditText
         android:id="@+id/training_name_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Training Name" />
+        android:hint="Enter Training Name"
+        android:background="@drawable/rounded_edittext"
+        android:padding="16dp"
+        android:textColor="#3100d4"
+        android:textColorHint="#978cbd"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
 
-    <LinearLayout
-        android:id="@+id/exercises_container"
+    <!-- Scrollable Container for Exercises -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="16dp" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="16dp">
 
+        <LinearLayout
+            android:id="@+id/exercises_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <!-- Add Exercise Button -->
     <Button
         android:id="@+id/add_exercise_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add Exercise"
-        android:layout_marginTop="16dp" />
+        android:background="@drawable/button_gradient"
+        android:textColor="@android:color/white"
+        android:padding="16dp"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp"
+        android:drawableEnd="@drawable/ic_add"
+        android:drawablePadding="8dp" />
 
+    <!-- Save Training Button -->
     <Button
         android:id="@+id/save_training_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Save Training"
-        android:layout_marginTop="16dp" />
+        android:background="@drawable/button_gradient"
+        android:textColor="@android:color/white"
+        android:padding="16dp"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp" />
 </LinearLayout>
