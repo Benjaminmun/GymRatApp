@@ -48,7 +48,7 @@
     </RelativeLayout>
 
     <!-- Scrollable Filter Buttons (Initially Hidden) -->
-    <ScrollView
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -57,127 +57,106 @@
 
         <LinearLayout
             android:id="@+id/filter_buttons_container"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:background="@drawable/rounded_edittext"
             android:padding="5dp"
             android:gravity="center">
 
-            <!-- First Row: Arms, Back, Olympic, All -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <!-- All Buttons in a Single Row: Arms, Back, Olympic, All, Chest, Core, Glutes, Shoulders, Legs -->
+            <Button
+                android:id="@+id/arms_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:text="Arms"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
 
-                <Button
-                    android:id="@+id/arms_category_button"
-                    style="@style/MyButton"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Arms"
-                    android:textColor="#fff"
-                    android:background="@drawable/button_gradient"
-                    android:layout_marginEnd="8dp" />
-
-                <Button
-                    android:id="@+id/back_category_button"
-                    style="@style/MyButton"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Back"
-                    android:textColor="#fff"
-                    android:background="@drawable/button_gradient"
-                    android:layout_marginEnd="8dp" />
-
-                <Button
-                    android:id="@+id/olympic_category_button"
-                    style="@style/MyButton"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Olympic"
-                    android:textSize="10dp"
-                    android:textColor="#fff"
-                    android:background="@drawable/button_gradient"
-                    android:layout_marginEnd="8dp" />
-
-                <Button
-                    android:id="@+id/filter_all_button"
-                    style="@style/MyButton"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="All"
-                    android:background="@drawable/button_gradient"
-                    android:textColor="#fff"/>
-            </LinearLayout>
-
-            <!-- Second Row: Chest, Core, Glutes, Shoulders, Legs -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/back_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp">
+                android:text="Back"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
 
-                <Button
-                    android:id="@+id/chest_category_button"
-                    style="@style/MyButton"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Chest"
-                    android:textColor="#fff"
-                    android:background="@drawable/button_gradient"
-                    android:layout_marginEnd="8dp" />
+            <Button
+                android:id="@+id/olympic_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Olympic"
+                android:textSize="10dp"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
 
-                <Button
-                    android:id="@+id/core_category_button"
-                    style="@style/MyButton"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Core"
-                    android:textColor="#fff"
-                    android:background="@drawable/button_gradient"
-                    android:layout_marginEnd="8dp" />
+            <Button
+                android:id="@+id/filter_all_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="All"
+                android:background="@drawable/button_gradient"
+                android:textColor="#fff"
+                android:layout_marginEnd="8dp" />
 
-                <Button
-                    android:id="@+id/glutes_category_button"
-                    style="@style/MyButton"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Glutes"
-                    android:textColor="#fff"
-                    android:background="@drawable/button_gradient"
-                    android:layout_marginEnd="8dp" />
+            <Button
+                android:id="@+id/chest_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chest"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
 
-                <Button
-                    android:id="@+id/shoulder_category_button"
-                    style="@style/MyButton"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Shoulders"
-                    android:textColor="#fff"
-                    android:background="@drawable/button_gradient"
-                    android:layout_marginEnd="8dp" />
+            <Button
+                android:id="@+id/core_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Core"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
 
-                <Button
-                    android:id="@+id/leg_category_button"
-                    style="@style/MyButton"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Legs"
-                    android:textColor="#fff"
-                    android:background="@drawable/button_gradient" />
-            </LinearLayout>
+            <Button
+                android:id="@+id/glutes_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Glutes"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/shoulder_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shoulders"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/leg_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Legs"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient" />
         </LinearLayout>
-    </ScrollView>
+    </HorizontalScrollView>
+
 
     <!-- Scrollable Container for Workout Buttons -->
     <ScrollView
