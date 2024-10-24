@@ -2,6 +2,8 @@ package student.inti.gymratdev3;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +20,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import android.text.Editable;
-import android.text.TextWatcher;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TrainingFragment extends Fragment {
 
@@ -28,11 +30,13 @@ public class TrainingFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
 
+    // List to store all training buttons for filtering
+    private List<Button> allTrainingButtons = new ArrayList<>();
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_training, container, false);
 
-        // Initialize UI elements
         trainingContainer = rootView.findViewById(R.id.training_container);
         addTrainingButton = rootView.findViewById(R.id.add_training_button);
         EditText searchEditText = rootView.findViewById(R.id.search_edit_text);
@@ -41,66 +45,69 @@ public class TrainingFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (currentUser != null) {
-            // Load user-specific trainings from Firestore
-            loadUserTrainings(currentUser.getUid());
-        } else {
-            Toast.makeText(getContext(), "User not authenticated", Toast.LENGTH_SHORT).show();
-        }
+        // Add default trainings
+        addDefaultTrainings();
 
-        // Add listener to the "Add Training" button
+        // Add listener to the Add Training button
         addTrainingButton.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), EditUserTrainingActivity.class);
             intent.putExtra("TRAINING_NAME", "New User Training");
             startActivity(intent);
         });
 
-        // Implement search functionality
+        // Load user-specific trainings from Firestore
+        loadUserTrainings();
+
+        // Set up the search functionality
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Not needed
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Filter trainings based on the input search query
                 filterTrainings(s.toString());
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-                // Not needed
-            }
+            public void afterTextChanged(Editable s) {}
         });
 
         return rootView;
     }
 
-    // Method to load user-specific trainings from Firestore
-    private void loadUserTrainings(String userId) {
-        db.collection("trainings")
-                .whereEqualTo("userId", userId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        trainingContainer.removeAllViews();  // Clear previous trainings
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            String trainingName = document.getString("trainingName");
-                            addTrainingButtonToContainer(trainingName);
-                        }
-                    } else {
-                        Toast.makeText(getContext(), "Error loading trainings", Toast.LENGTH_SHORT).show();
-                    }
-                });
+    // Method to add default trainings
+    private void addDefaultTrainings() {
+        addTrainingButtonToContainer("Full Body Workout");
+        addTrainingButtonToContainer("Cardio Burn");
+        addTrainingButtonToContainer("Strength Training");
     }
 
-    // Method to add a training button to the container
+    // Method to load user-specific trainings from Firestore
+    private void loadUserTrainings() {
+        if (currentUser == null) {
+            Toast.makeText(getContext(), "User not authenticated", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        db.collection("trainings")
+                .whereEqualTo("userId", currentUser.getUid())  // Filter trainings by user ID
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        String trainingName = document.getString("trainingName");
+                        if (trainingName != null) {
+                            addTrainingButtonToContainer(trainingName);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to load trainings", Toast.LENGTH_SHORT).show());
+    }
+
+    // Method to add a training button to the container and list
     private void addTrainingButtonToContainer(String trainingName) {
         Button trainingButton = new Button(getContext());
         trainingButton.setText(trainingName);
         trainingButton.setBackgroundResource(R.drawable.button_gradient_alternate);
-
         trainingButton.setTextColor(getResources().getColor(android.R.color.white));
         trainingButton.setPadding(16, 16, 16, 16);
 
@@ -110,11 +117,13 @@ public class TrainingFragment extends Fragment {
         );
         params.setMargins(16, 16, 16, 16);
         trainingButton.setLayoutParams(params);
-
         trainingButton.setTextSize(16);
-        trainingContainer.addView(trainingButton);
 
-        // Set onClickListener to open the TrainingDetailActivity when clicked
+        // Add to the layout and the list of buttons for filtering
+        trainingContainer.addView(trainingButton);
+        allTrainingButtons.add(trainingButton);
+
+        // Set the button's click listener
         trainingButton.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), TrainingDetailActivity.class);
             intent.putExtra("TRAINING_NAME", trainingName);
@@ -124,16 +133,13 @@ public class TrainingFragment extends Fragment {
 
     // Method to filter displayed trainings based on search input
     private void filterTrainings(String query) {
-        for (int i = 0; i < trainingContainer.getChildCount(); i++) {
-            View view = trainingContainer.getChildAt(i);
-            if (view instanceof Button) {
-                Button trainingButton = (Button) view;
-                String trainingName = trainingButton.getText().toString().toLowerCase();
-                if (trainingName.contains(query.toLowerCase())) {
-                    trainingButton.setVisibility(View.VISIBLE);
-                } else {
-                    trainingButton.setVisibility(View.GONE);
-                }
+        query = query.toLowerCase();
+        for (Button trainingButton : allTrainingButtons) {
+            String trainingName = trainingButton.getText().toString().toLowerCase();
+            if (trainingName.contains(query)) {
+                trainingButton.setVisibility(View.VISIBLE);
+            } else {
+                trainingButton.setVisibility(View.GONE);
             }
         }
     }
