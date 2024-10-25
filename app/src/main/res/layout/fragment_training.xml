@@ -14,32 +14,54 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp">
+        android:layout_marginBottom="8dp">
 
-        <!-- Search EditText -->
         <EditText
             android:id="@+id/search_edit_text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_height="48dp"
             android:background="@drawable/rounded_edittext"
             android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="12dp"
             android:hint="Search trainings..."
             android:inputType="text"
             android:minHeight="48dp"
             android:padding="16dp"
-            android:paddingStart="20dp"
             android:textColor="#3100d4"
             android:textColorHint="#978cbd"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp"
+            android:paddingStart="20dp"
+            android:contentDescription="Search trainings" />
     </RelativeLayout>
+
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/loading_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="24dp" />
+
+    <!-- Empty State Message -->
+    <TextView
+        android:id="@+id/empty_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No trainings available"
+        android:textSize="16sp"
+        android:textColor="#808080"
+        android:visibility="gone"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp" />
 
     <!-- Scrollable Container for Training Buttons -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="24dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:layout_marginBottom="24dp">
 
         <LinearLayout
             android:id="@+id/training_container"
@@ -55,13 +77,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add Training"
-        android:layout_gravity="center"
         android:background="@drawable/button_gradient"
         android:textColor="@android:color/white"
-        android:padding="16dp"
         android:textSize="18sp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
         android:drawableEnd="@drawable/ic_add"
-        android:drawablePadding="8dp" />
+        android:drawablePadding="8dp"
+        android:contentDescription="Add new training"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:padding="16dp" />
 </LinearLayout>

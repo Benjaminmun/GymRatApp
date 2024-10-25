@@ -1,6 +1,7 @@
 package student.inti.gymratdev3;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@RequiresApi(api = Build.VERSION_CODES.R)
 public class TrainingFragment extends Fragment {
 
     private LinearLayout trainingContainer;
@@ -47,17 +50,17 @@ public class TrainingFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        // Load user-specific trainings with real-time updates
+        loadUserTrainings();
+
+        // Set up search functionality
+        setupSearchFunctionality(rootView);
+
         // Add default trainings
         addDefaultTrainings();
 
         // Add listener to the Add Training button
         addTrainingButton.setOnClickListener(v -> navigateToEditUserTraining());
-
-        // Load user-specific trainings from Firestore
-        loadUserTrainings();
-
-        // Set up search functionality
-        setupSearchFunctionality(rootView);
 
         return rootView;
     }
@@ -96,28 +99,37 @@ public class TrainingFragment extends Fragment {
         }
     }
 
-    // Method to load user-specific trainings from Firestore
+    // Inside loadUserTrainings method, enhance to fetch more fields from Firestore
     private void loadUserTrainings() {
         if (currentUser == null) {
-            Toast.makeText(getContext(), "User not authenticated", Toast.LENGTH_SHORT).show();
+            showSnackbar("User not authenticated");
             return;
         }
 
+        // Set up a Firestore listener for real-time updates
         db.collection("trainings")
-                .whereEqualTo("userId", currentUser.getUid())  // Filter trainings by user ID
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
+                .whereEqualTo("userId", currentUser.getUid())
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if (e != null) {
+                        showSnackbar("Failed to load trainings");
+                        return;
+                    }
+
+                    // Clear existing training buttons before loading new data
+                    trainingContainer.removeAllViews();
+                    allTrainingViews.clear(); // Clear the stored training views
+
+                    // Load each training from the snapshot
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         String trainingName = document.getString("trainingName");
                         if (trainingName != null) {
-                            addTrainingButtonToContainer(trainingName, true);
+                            addTrainingButtonToContainer(trainingName, true); // Add user trainings with remove option
                         }
                     }
-                })
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to load trainings", Toast.LENGTH_SHORT).show());
+                });
     }
 
-    // Method to add a training button and possibly a remove button
+    // Method to add a training button to the UI
     private void addTrainingButtonToContainer(String trainingName, boolean isRemovable) {
         View trainingView = LayoutInflater.from(getContext()).inflate(R.layout.training_button_layout, null);
         Button trainingButton = trainingView.findViewById(R.id.training_button);
@@ -158,15 +170,15 @@ public class TrainingFragment extends Fragment {
                         for (QueryDocumentSnapshot document : querySnapshot) {
                             db.collection("trainings").document(document.getId()).delete()
                                     .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(getContext(), trainingName + " removed", Toast.LENGTH_SHORT).show();
+                                        showSnackbar(trainingName + " removed");
                                         trainingContainer.removeView(trainingView);
                                         allTrainingViews.remove(trainingView);
                                     })
-                                    .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to remove training", Toast.LENGTH_SHORT).show());
+                                    .addOnFailureListener(e -> showSnackbar("Failed to remove training"));
                         }
                     }
                 })
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to find training", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> showSnackbar("Failed to find training"));
     }
 
     // Method to filter displayed trainings based on search input
@@ -177,5 +189,10 @@ public class TrainingFragment extends Fragment {
             String trainingName = trainingButton.getText().toString().toLowerCase();
             trainingView.setVisibility(trainingName.contains(query) ? View.VISIBLE : View.GONE);
         }
+    }
+
+    // Utility method to show Snackbar for user feedback
+    private void showSnackbar(String message) {
+        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show();
     }
 }

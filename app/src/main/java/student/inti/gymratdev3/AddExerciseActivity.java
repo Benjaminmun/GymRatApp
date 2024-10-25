@@ -23,9 +23,8 @@ import java.util.Map;
 
 public class AddExerciseActivity extends AppCompatActivity {
 
-    private EditText editExerciseName, editPreparation, editExecution,
-            editFocusArea, editEquipment;
-    private Spinner editExerciseCategory;
+    private EditText editExerciseName, editPreparation, editExecution;
+    private Spinner editFocusArea, editEquipment, editExerciseCategory;
     private Button saveExerciseButton, cancelButton;
     private ProgressBar progressBar;
     private FirebaseAuth firebaseAuth;
@@ -50,18 +49,30 @@ public class AddExerciseActivity extends AppCompatActivity {
         editExerciseName = findViewById(R.id.edit_exercise_name);
         editPreparation = findViewById(R.id.edit_preparation);
         editExecution = findViewById(R.id.edit_execution);
-        editFocusArea = findViewById(R.id.edit_focus_area);
-        editEquipment = findViewById(R.id.edit_equipment);
+        editFocusArea = findViewById(R.id.spinner_focus_area);
+        editEquipment = findViewById(R.id.spinner_equipment);
         editExerciseCategory = findViewById(R.id.spinner_exercise_category);
         saveExerciseButton = findViewById(R.id.btn_save_exercise);
         cancelButton = findViewById(R.id.cancel_button);
         progressBar = findViewById(R.id.progressBar);
 
         // Set up Spinner with exercise categories
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+        ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter.createFromResource(
                 this, R.array.exercise_categories, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        editExerciseCategory.setAdapter(adapter);
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        editExerciseCategory.setAdapter(categoryAdapter);
+
+        // Set up Spinner for focus areas
+        ArrayAdapter<CharSequence> focusAdapter = ArrayAdapter.createFromResource(
+                this, R.array.focus_areas, android.R.layout.simple_spinner_item);
+        focusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        editFocusArea.setAdapter(focusAdapter);
+
+        // Set up Spinner for equipment
+        ArrayAdapter<CharSequence> equipmentAdapter = ArrayAdapter.createFromResource(
+                this, R.array.equipment_types, android.R.layout.simple_spinner_item);
+        equipmentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        editEquipment.setAdapter(equipmentAdapter);
 
         // Set listeners for buttons
         saveExerciseButton.setOnClickListener(v -> saveExercise());
@@ -73,8 +84,12 @@ public class AddExerciseActivity extends AppCompatActivity {
         String name = editExerciseName.getText().toString().trim();  // Trim spaces
         String preparation = editPreparation.getText().toString().trim();  // Trim spaces
         String execution = editExecution.getText().toString().trim();  // Trim spaces
-        String focusArea = editFocusArea.getText().toString().trim();  // Trim spaces
-        String equipment = editEquipment.getText().toString().trim();  // Trim spaces
+        String focusArea = editFocusArea.getSelectedItem() != null
+                ? editFocusArea.getSelectedItem().toString().trim()  // Trim spaces
+                : "";
+        String equipment = editEquipment.getSelectedItem() != null
+                ? editEquipment.getSelectedItem().toString().trim()  // Trim spaces
+                : "";
         String category = editExerciseCategory.getSelectedItem() != null
                 ? editExerciseCategory.getSelectedItem().toString().trim()  // Trim spaces
                 : "";
@@ -89,11 +104,11 @@ public class AddExerciseActivity extends AppCompatActivity {
             return;
         }
         if (TextUtils.isEmpty(focusArea)) {
-            editFocusArea.setError("Focus area is required");
+            Toast.makeText(this, "Please select a focus area", Toast.LENGTH_SHORT).show();
             return;
         }
         if (TextUtils.isEmpty(equipment)) {
-            editEquipment.setError("Equipment is required");
+            Toast.makeText(this, "Please select an equipment type", Toast.LENGTH_SHORT).show();
             return;
         }
         if (TextUtils.isEmpty(preparation)) {
@@ -117,7 +132,6 @@ public class AddExerciseActivity extends AppCompatActivity {
                                            String preparation, String execution, String category) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String userId = currentUser.getUid();
-        String lowerCaseName = name.toLowerCase();  // Convert input name to lowercase for checking
 
         // Query Firestore for any document where the name matches case-insensitively
         db.collection("users").document(userId)
@@ -171,6 +185,4 @@ public class AddExerciseActivity extends AppCompatActivity {
                     Toast.makeText(AddExerciseActivity.this, "Failed to add exercise: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
-
 }

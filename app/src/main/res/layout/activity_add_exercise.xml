@@ -16,8 +16,6 @@
         android:gravity="center">
 
         <!-- Title for Adding Exercise -->
-
-        <!-- Exercise Name Input -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -27,6 +25,7 @@
             android:textSize="40sp"
             android:textStyle="bold" />
 
+        <!-- Exercise Name Input -->
         <LinearLayout
             android:id="@+id/exercise_name_container"
             android:layout_width="match_parent"
@@ -53,8 +52,7 @@
                 android:minHeight="48dp"
                 android:textSize="16sp"
                 android:textColor="#3100d4"
-                android:textColorHint="#978cbd"
-                 />
+                android:textColorHint="#978cbd" />
 
         </LinearLayout>
 
@@ -76,28 +74,28 @@
                 android:layout_marginBottom="8dp" />
 
             <EditText
-            android:id="@+id/edit_execution"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter execution (steps)"
-            android:background="@drawable/rounded_edittext"
-            android:inputType="textMultiLine"
-            android:minHeight="48dp"
+                android:id="@+id/edit_execution"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter execution (steps)"
+                android:background="@drawable/rounded_edittext"
+                android:inputType="textMultiLine"
+                android:minHeight="48dp"
                 android:padding="12dp"
-            android:textSize="16sp"
+                android:textSize="16sp"
                 android:textColor="#3100d4"
-                android:textColorHint="#978cbd"
-             />
+                android:textColorHint="#978cbd" />
 
         </LinearLayout>
 
-        <!-- Focus Area Dynamic Input -->
+        <!-- Focus Area Dropdown (Spinner) -->
         <LinearLayout
             android:id="@+id/focus_area_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginBottom="16dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -106,27 +104,25 @@
                 android:textColor="#3100d4"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
-            <EditText
-                android:id="@+id/edit_focus_area"
+
+            <Spinner
+                android:id="@+id/spinner_focus_area"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="e.g. Chest, Triceps"
                 android:background="@drawable/rounded_edittext"
                 android:padding="12dp"
-                android:minHeight="48dp"
-                android:textSize="16sp"
-                android:textColor="#3100d4"
-                android:textColorHint="#978cbd"/>
+                android:layout_marginBottom="16dp" />
 
         </LinearLayout>
 
-        <!-- Equipment Dynamic Input -->
+        <!-- Equipment Dropdown (Spinner) -->
         <LinearLayout
             android:id="@+id/equipment_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginBottom="16dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -135,17 +131,14 @@
                 android:textColor="#3100d4"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
-            <EditText
-                android:id="@+id/edit_equipment"
+
+            <Spinner
+                android:id="@+id/spinner_equipment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="e.g. Bench, Dumbbells"
                 android:background="@drawable/rounded_edittext"
                 android:padding="12dp"
-                android:minHeight="48dp"
-                android:textSize="16sp"
-                android:textColor="#3100d4"
-                android:textColorHint="#978cbd"/>
+                android:layout_marginBottom="16dp" />
 
         </LinearLayout>
 
@@ -187,6 +180,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginBottom="16dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -195,17 +189,16 @@
                 android:textColor="#3100d4"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
+
             <Spinner
                 android:id="@+id/spinner_exercise_category"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_edittext"
                 android:padding="12dp"
-                android:layout_marginBottom="16dp"
-                android:textColor="#3100d4"
-                android:textColorHint="#978cbd"/>
-        </LinearLayout>
+                android:layout_marginBottom="16dp" />
 
+        </LinearLayout>
 
         <!-- Save and Cancel Buttons -->
         <LinearLayout
@@ -237,6 +230,7 @@
                 android:textColor="@android:color/white"
                 android:padding="16dp"
                 android:layout_marginStart="8dp" />
+
         </LinearLayout>
 
         <!-- ProgressBar for loading feedback -->

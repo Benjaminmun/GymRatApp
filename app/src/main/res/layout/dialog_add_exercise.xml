@@ -7,22 +7,22 @@
 
     <EditText
         android:id="@+id/exercise_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:hint="Exercise Name"
-        android:inputType="text" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <EditText
         android:id="@+id/exercise_reps"
+        android:hint="Reps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Reps"
         android:inputType="number" />
 
     <EditText
         android:id="@+id/exercise_sets"
+        android:hint="Sets"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Sets"
         android:inputType="number" />
+
 </LinearLayout>

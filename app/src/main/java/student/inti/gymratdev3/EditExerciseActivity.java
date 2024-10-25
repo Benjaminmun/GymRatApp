@@ -5,9 +5,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -19,11 +16,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+import student.inti.gymratdev3.databinding.ActivityEditExerciseBinding;
+
 public class EditExerciseActivity extends AppCompatActivity {
 
-    private EditText editExerciseName, editFocusArea, editEquipment, editPreparation, editExecution;
-    private Button saveExerciseButton, cancelButton;
-    private ProgressBar progressBar;
+    private ActivityEditExerciseBinding binding;
+    private FirebaseFirestore db;
+    private String userId;
     private String workoutName;
     private String exerciseCategory;
 
@@ -31,185 +30,181 @@ public class EditExerciseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_exercise);
 
-        // Change status bar color to match button color
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            getWindow().setStatusBarColor(android.graphics.Color.parseColor("#3100d4"));
-        }
+        // Initialize ViewBinding
+        binding = ActivityEditExerciseBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        // Initialize views
-        initializeViews();
+        // Firebase Initialization
+        db = FirebaseFirestore.getInstance();
+        userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Get workout details from intent
+        // Change status bar color
+        setStatusBarColor("#3100d4");
+
+        // Get Intent Extras
         workoutName = getIntent().getStringExtra("exerciseName");
 
-        // Load existing exercise data
+        // Load Exercise Data from Firestore
         loadExerciseData();
 
-        // Set click listener for the Save Exercise button
-        saveExerciseButton.setOnClickListener(v -> saveExercise());
-        cancelButton.setOnClickListener(v -> finish());
+        // Set OnClickListeners
+        binding.btnSaveExercise.setOnClickListener(v -> saveExercise());
+        binding.cancelButton.setOnClickListener(v -> finish());
     }
 
-    private void initializeViews() {
-        editExerciseName = findViewById(R.id.edit_exercise_name);
-        editFocusArea = findViewById(R.id.edit_focus_area);
-        editEquipment = findViewById(R.id.edit_equipment);
-        editPreparation = findViewById(R.id.edit_preparation);
-        editExecution = findViewById(R.id.edit_execution);
-        saveExerciseButton = findViewById(R.id.btn_save_exercise);
-        progressBar = findViewById(R.id.progressBar);
-        cancelButton = findViewById(R.id.cancel_button);
+    private void setStatusBarColor(String colorHex) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(android.graphics.Color.parseColor(colorHex));
+        }
     }
 
     private void loadExerciseData() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        showProgress();
 
-        db.collection("users")
-                .document(userId)
-                .collection("custom_exercises")
-                .document(workoutName)
+        db.collection("users").document(userId)
+                .collection("custom_exercises").document(workoutName)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        Map<String, Object> exerciseData = documentSnapshot.getData();
-                        editExerciseName.setText((String) exerciseData.get("exercise_name"));
-                        editFocusArea.setText((String) exerciseData.get("focus_area"));
-                        editEquipment.setText((String) exerciseData.get("equipment"));
-                        editPreparation.setText((String) exerciseData.get("preparation"));
-                        editExecution.setText((String) exerciseData.get("execution"));
-                        exerciseCategory = (String) exerciseData.get("category");  // Store the category for later use
+                        populateExerciseData(documentSnapshot.getData());
                     } else {
-                        Toast.makeText(EditExerciseActivity.this, "Failed to load custom exercise data.", Toast.LENGTH_SHORT).show();
+                        showToast("Failed to load custom exercise data.");
                     }
+                    hideProgress();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(EditExerciseActivity.this, "Error loading exercise data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    hideProgress();
+                    showToast("Error loading exercise data: " + e.getMessage());
                 });
+    }
+
+    private void populateExerciseData(Map<String, Object> exerciseData) {
+        binding.editExerciseName.setText((String) exerciseData.get("exercise_name"));
+        binding.editFocusArea.setText((String) exerciseData.get("focus_area"));
+        binding.editEquipment.setText((String) exerciseData.get("equipment"));
+        binding.editPreparation.setText((String) exerciseData.get("preparation"));
+        binding.editExecution.setText((String) exerciseData.get("execution"));
+        exerciseCategory = (String) exerciseData.get("category");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void saveExercise() {
-        String name = editExerciseName.getText().toString().trim();
-        String focusArea = editFocusArea.getText().toString().trim();
-        String equipment = editEquipment.getText().toString().trim();
-        String preparation = editPreparation.getText().toString().trim();
-        String execution = editExecution.getText().toString().trim();
+        String name = binding.editExerciseName.getText().toString().trim();
+        String focusArea = binding.editFocusArea.getText().toString().trim();
+        String equipment = binding.editEquipment.getText().toString().trim();
+        String preparation = binding.editPreparation.getText().toString().trim();
+        String execution = binding.editExecution.getText().toString().trim();
 
-        if (TextUtils.isEmpty(name)) {
-            editExerciseName.setError("Exercise name is required");
-            return;
+        if (isValidInput(name, focusArea, equipment, preparation, execution)) {
+            showProgress();
+            checkForDuplicateExercise(name, focusArea, equipment, preparation, execution);
         }
-        if (TextUtils.isEmpty(execution)) {
-            editExecution.setError("Execution steps are required");
-            return;
-        }
-        if (TextUtils.isEmpty(focusArea)) {
-            editFocusArea.setError("Focus area is required");
-            return;
-        }
-        if (TextUtils.isEmpty(equipment)) {
-            editEquipment.setError("Equipment is required");
-            return;
-        }
-        if (TextUtils.isEmpty(preparation)) {
-            editPreparation.setError("Preparation steps are required");
-            return;
-        }
-
-        // Show progress bar while checking for duplicates and saving
-        progressBar.setVisibility(View.VISIBLE);
-
-        // Check for duplicate exercise name before saving
-        checkForDuplicateExercise(name, focusArea, equipment, preparation, execution);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private void checkForDuplicateExercise(String name, String focusArea, String equipment,
-                                           String preparation, String execution) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String lowerCaseName = name.toLowerCase();  // Convert input name to lowercase for checking
+    private boolean isValidInput(String name, String focusArea, String equipment, String preparation, String execution) {
+        if (TextUtils.isEmpty(name)) {
+            binding.editExerciseName.setError("Exercise name is required");
+            return false;
+        }
+        if (TextUtils.isEmpty(execution)) {
+            binding.editExecution.setError("Execution steps are required");
+            return false;
+        }
+        if (TextUtils.isEmpty(focusArea)) {
+            binding.editFocusArea.setError("Focus area is required");
+            return false;
+        }
+        if (TextUtils.isEmpty(equipment)) {
+            binding.editEquipment.setError("Equipment is required");
+            return false;
+        }
+        if (TextUtils.isEmpty(preparation)) {
+            binding.editPreparation.setError("Preparation steps are required");
+            return false;
+        }
+        return true;
+    }
 
-        // Query Firestore for any document where the name matches case-insensitively
-        db.collection("users").document(userId)
+    private void checkForDuplicateExercise(String name, String focusArea, String equipment, String preparation, String execution) {
+        db.collection("users")
+                .document(userId)
                 .collection("custom_exercises")
+                .whereEqualTo("exercise_name", name) // Query only by name to reduce reads
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    boolean exists = queryDocumentSnapshots.getDocuments().stream()
-                            .filter(document -> !document.getId().equals(workoutName)) // Exclude the current exercise being edited
-                            .anyMatch(document -> document.getString("exercise_name").equalsIgnoreCase(name));  // Check case-insensitive match
+                .addOnSuccessListener(querySnapshot -> {
+                    boolean exists = querySnapshot.getDocuments().stream()
+                            .anyMatch(doc -> !doc.getId().equals(workoutName)); // Ensure the same exercise isn't matched
 
                     if (exists) {
-                        // Exercise name already exists, show error
-                        progressBar.setVisibility(View.INVISIBLE);
-                        Toast.makeText(EditExerciseActivity.this, "Exercise with this name already exists", Toast.LENGTH_SHORT).show();
+                        handleDuplicateExercise();
                     } else {
-                        // Exercise name does not exist, proceed to save
                         updateExerciseInDatabase(name, focusArea, equipment, preparation, execution);
                     }
                 })
-                .addOnFailureListener(e -> {
-                    progressBar.setVisibility(View.INVISIBLE);
-                    Toast.makeText(EditExerciseActivity.this, "Error checking exercise: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e -> handleFirestoreError(e, "Error checking exercise"));
     }
 
-    private void updateExerciseInDatabase(String name, String focusArea, String equipment, String preparation, String execution) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    private void handleDuplicateExercise() {
+        hideProgress();
+        showToast("Exercise with this name already exists");
+    }
 
-        // Prepare exercise data
+    private void handleFirestoreError(Exception e, String message) {
+        hideProgress();
+        showToast(message + ": " + e.getMessage());
+    }
+
+
+    private void updateExerciseInDatabase(String name, String focusArea, String equipment, String preparation, String execution) {
         Map<String, Object> exerciseData = new HashMap<>();
         exerciseData.put("exercise_name", name);
         exerciseData.put("focus_area", focusArea);
         exerciseData.put("equipment", equipment);
         exerciseData.put("preparation", preparation);
         exerciseData.put("execution", execution);
-        exerciseData.put("category", exerciseCategory);  // Keep the same category as originally set
+        exerciseData.put("category", exerciseCategory);
 
-        // Step 1: Delete the old document if the exercise name has changed
         if (!name.equals(workoutName)) {
-            db.collection("users")
-                    .document(userId)
-                    .collection("custom_exercises")
-                    .document(workoutName)
+            db.collection("users").document(userId)
+                    .collection("custom_exercises").document(workoutName)
                     .delete()
-                    .addOnSuccessListener(aVoid -> {
-                        // After deleting the old document, save the new one with the updated name
-                        saveNewExerciseData(db, userId, name, exerciseData);
-                    })
+                    .addOnSuccessListener(aVoid -> saveNewExerciseData(name, exerciseData))
                     .addOnFailureListener(e -> {
-                        progressBar.setVisibility(View.INVISIBLE);
-                        Toast.makeText(EditExerciseActivity.this, "Failed to update exercise: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        hideProgress();
+                        showToast("Failed to update exercise: " + e.getMessage());
                     });
         } else {
-            // If the name has not changed, just update the existing document
-            saveNewExerciseData(db, userId, name, exerciseData);
+            saveNewExerciseData(name, exerciseData);
         }
     }
 
-    private void saveNewExerciseData(FirebaseFirestore db, String userId, String newName, Map<String, Object> exerciseData) {
-        db.collection("users")
-                .document(userId)
-                .collection("custom_exercises")
-                .document(newName)
+    private void saveNewExerciseData(String name, Map<String, Object> exerciseData) {
+        db.collection("users").document(userId)
+                .collection("custom_exercises").document(name)
                 .set(exerciseData)
                 .addOnSuccessListener(aVoid -> {
-                    progressBar.setVisibility(View.INVISIBLE);
-                    Toast.makeText(EditExerciseActivity.this, "Exercise updated successfully", Toast.LENGTH_SHORT).show();
-
-                    // Set result to notify WorkoutDetailActivity
+                    hideProgress();
+                    showToast("Exercise updated successfully");
                     setResult(RESULT_OK);
-
-                    finish(); // Close the current activity (EditExerciseActivity)
+                    finish();
                 })
                 .addOnFailureListener(e -> {
-                    progressBar.setVisibility(View.INVISIBLE);
-                    Toast.makeText(EditExerciseActivity.this, "Failed to update exercise: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    hideProgress();
+                    showToast("Failed to update exercise: " + e.getMessage());
                 });
+    }
+
+    private void showProgress() {
+        binding.progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgress() {
+        binding.progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
