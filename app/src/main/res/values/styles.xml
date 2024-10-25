@@ -7,5 +7,16 @@
         <item name="rippleColor">@null</item>
     </style>
 
+    <style name="ModernAlertDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="android:background">@color/white</item> <!-- Dialog background -->
+        <item name="materialAlertDialogBodyTextStyle">@style/BodyText</item> <!-- Text styling -->
+        <item name="android:padding">16dp</item> <!-- Add padding -->
+        <item name="android:windowMinWidthMajor">80%</item> <!-- Width as percentage of screen -->
+    </style>
+
+    <style name="BodyText" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
 
 </resources>

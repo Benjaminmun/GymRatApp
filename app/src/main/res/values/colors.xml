@@ -7,5 +7,7 @@
     <color name="your_icon_color">#FFFFFF</color> <!-- Icon Color -->
     <color name="your_text_color">#FFFFFF</color> <!-- Text Color -->
     <color name="colorPrimary">#FF000000</color>
-    <color name="colorAccent">#E30000</color> <!-- Set colorPrimary to Black -->
+    <color name="colorAccent">#E30000</color>
+    <color name="teal_700">#1623D9</color> <!-- Set colorPrimary to Black -->
+
 </resources>

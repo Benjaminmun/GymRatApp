@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -24,7 +23,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @RequiresApi(api = Build.VERSION_CODES.R)
@@ -46,7 +44,7 @@ public class TrainingFragment extends Fragment {
         // Initialize views
         initializeViews(rootView);
 
-        // Initialize Firestore and get current user
+        // Initialize Firestore and get the current user
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -59,7 +57,7 @@ public class TrainingFragment extends Fragment {
         // Add default trainings
         addDefaultTrainings();
 
-        // Add listener to the Add Training button
+        // Add listener to the "Add Training" button
         addTrainingButton.setOnClickListener(v -> navigateToEditUserTraining());
 
         return rootView;
@@ -92,21 +90,18 @@ public class TrainingFragment extends Fragment {
         });
     }
 
-    // Method to add default trainings
     private void addDefaultTrainings() {
         for (String training : defaultTrainings) {
-            addTrainingButtonToContainer(training, false);
+            addTrainingButtonToContainer(training, null, false);
         }
     }
 
-    // Inside loadUserTrainings method, enhance to fetch more fields from Firestore
     private void loadUserTrainings() {
         if (currentUser == null) {
             showSnackbar("User not authenticated");
             return;
         }
 
-        // Set up a Firestore listener for real-time updates
         db.collection("trainings")
                 .whereEqualTo("userId", currentUser.getUid())
                 .addSnapshotListener((queryDocumentSnapshots, e) -> {
@@ -115,22 +110,29 @@ public class TrainingFragment extends Fragment {
                         return;
                     }
 
-                    // Clear existing training buttons before loading new data
-                    trainingContainer.removeAllViews();
-                    allTrainingViews.clear(); // Clear the stored training views
+                    // Clear user-specific trainings only (keep default ones)
+                    for (View trainingView : allTrainingViews) {
+                        Button trainingButton = trainingView.findViewById(R.id.training_button);
+                        String trainingName = trainingButton.getText().toString();
+                        if (!defaultTrainings.contains(trainingName)) {
+                            trainingContainer.removeView(trainingView);
+                        }
+                    }
+                    allTrainingViews.clear(); // Clear all stored views
 
-                    // Load each training from the snapshot
+                    // Add each training from Firestore with the document ID
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         String trainingName = document.getString("trainingName");
+                        String trainingId = document.getId(); // Get the unique document ID
+
                         if (trainingName != null) {
-                            addTrainingButtonToContainer(trainingName, true); // Add user trainings with remove option
+                            addTrainingButtonToContainer(trainingName, trainingId, true); // Add with document ID
                         }
                     }
                 });
     }
 
-    // Method to add a training button to the UI
-    private void addTrainingButtonToContainer(String trainingName, boolean isRemovable) {
+    private void addTrainingButtonToContainer(String trainingName, String trainingId, boolean isRemovable) {
         View trainingView = LayoutInflater.from(getContext()).inflate(R.layout.training_button_layout, null);
         Button trainingButton = trainingView.findViewById(R.id.training_button);
         Button removeButton = trainingView.findViewById(R.id.remove_button);
@@ -140,11 +142,12 @@ public class TrainingFragment extends Fragment {
         trainingButton.setTextColor(getResources().getColor(android.R.color.white));
         trainingButton.setPadding(16, 16, 16, 16);
 
-        trainingButton.setOnClickListener(v -> navigateToTrainingDetail(trainingName));
+        // Navigate to the detail activity with the trainingId
+        trainingButton.setOnClickListener(v -> navigateToTrainingDetail(trainingId));
 
         if (isRemovable) {
             removeButton.setVisibility(View.VISIBLE);
-            removeButton.setOnClickListener(v -> removeTrainingPlan(trainingName, trainingView));
+            removeButton.setOnClickListener(v -> removeTrainingPlan(trainingId, trainingView));
         } else {
             removeButton.setVisibility(View.GONE);
         }
@@ -153,35 +156,24 @@ public class TrainingFragment extends Fragment {
         allTrainingViews.add(trainingView);
     }
 
-    private void navigateToTrainingDetail(String trainingName) {
+    private void navigateToTrainingDetail(String trainingId) {
         Intent intent = new Intent(getContext(), TrainingDetailActivity.class);
-        intent.putExtra("TRAINING_NAME", trainingName);
+        intent.putExtra("TRAINING_ID", trainingId); // Pass the document ID
         startActivity(intent);
     }
 
-    // Method to remove training from Firestore and UI
-    private void removeTrainingPlan(String trainingName, View trainingView) {
-        db.collection("trainings")
-                .whereEqualTo("userId", currentUser.getUid())
-                .whereEqualTo("trainingName", trainingName)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    if (!querySnapshot.isEmpty()) {
-                        for (QueryDocumentSnapshot document : querySnapshot) {
-                            db.collection("trainings").document(document.getId()).delete()
-                                    .addOnSuccessListener(aVoid -> {
-                                        showSnackbar(trainingName + " removed");
-                                        trainingContainer.removeView(trainingView);
-                                        allTrainingViews.remove(trainingView);
-                                    })
-                                    .addOnFailureListener(e -> showSnackbar("Failed to remove training"));
-                        }
-                    }
+    private void removeTrainingPlan(String trainingId, View trainingView) {
+        // Delete the training by its document ID
+        db.collection("trainings").document(trainingId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    showSnackbar("Training removed");
+                    trainingContainer.removeView(trainingView);
+                    allTrainingViews.remove(trainingView);
                 })
-                .addOnFailureListener(e -> showSnackbar("Failed to find training"));
+                .addOnFailureListener(e -> showSnackbar("Failed to remove training"));
     }
 
-    // Method to filter displayed trainings based on search input
     private void filterTrainings(String query) {
         query = query.toLowerCase();
         for (View trainingView : allTrainingViews) {
@@ -191,7 +183,6 @@ public class TrainingFragment extends Fragment {
         }
     }
 
-    // Utility method to show Snackbar for user feedback
     private void showSnackbar(String message) {
         Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show();
     }
