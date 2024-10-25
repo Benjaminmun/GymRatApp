@@ -70,18 +70,27 @@ public class ExerciseFragment extends Fragment {
             userId = user.getUid();
         } else {
             Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
-            // Handle user not logged in appropriately
+            return view;
         }
-
 
         initializeUI(view); // Initialize all UI elements
         initializeDefaultWorkouts(); // Initialize default workout data
+        saveDefaultWorkoutsToGlobalCollection(); // Save default workouts to global collection
         setupFilterListeners(); // Setup filter button listeners
         setButtonListeners(); // Set click listeners for the buttons
 
         return view;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == getActivity().RESULT_OK) {
+            // Refresh the workouts after adding a new exercise
+            loadAllWorkouts();
+            Toast.makeText(getActivity(), "Exercise added successfully", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
     @Override
@@ -254,6 +263,7 @@ public class ExerciseFragment extends Fragment {
         ));
     }
 
+
     private void setupFilterListeners() {
         // Setup filter button listeners to filter workouts by category
         filterArmsButton.setOnClickListener(v -> filterWorkoutsByCategory("Arms", defaultArmsWorkouts));
@@ -288,6 +298,51 @@ public class ExerciseFragment extends Fragment {
         addWorkoutCategory("Glutes", defaultGlutesWorkouts);
         addWorkoutCategory("Shoulders", defaultShouldersWorkouts);
     }
+
+    private void saveDefaultWorkoutsToGlobalCollection() {
+        // Check if the `default_workouts` collection is empty
+        db.collection("default_workouts").get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult().isEmpty()) {
+                        Log.d("Firestore", "Saving default workouts to global collection...");
+                        // Save all categories to Firestore
+                        saveWorkoutCategoryToFirestore("Arms", defaultArmsWorkouts);
+                        saveWorkoutCategoryToFirestore("Back", defaultBackWorkouts);
+                        saveWorkoutCategoryToFirestore("Olympic", defaultOlympicWorkouts);
+                        saveWorkoutCategoryToFirestore("Legs", defaultLegWorkouts);
+                        saveWorkoutCategoryToFirestore("Chest", defaultChestWorkouts);
+                        saveWorkoutCategoryToFirestore("Core", defaultCoreWorkouts);
+                        saveWorkoutCategoryToFirestore("Glutes", defaultGlutesWorkouts);
+                        saveWorkoutCategoryToFirestore("Shoulders", defaultShouldersWorkouts);
+                    } else {
+                        Log.d("Firestore", "Default workouts already exist.");
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firestore", "Error fetching default workouts", e));
+    }
+
+    private void saveWorkoutCategoryToFirestore(String category, Map<String, Workout> workouts) {
+        for (Map.Entry<String, Workout> entry : workouts.entrySet()) {
+            String workoutName = entry.getKey(); // Use workout name as the document ID
+            Map<String, Object> workoutData = new HashMap<>();
+            workoutData.put("exercise_name", workoutName);
+            workoutData.put("category", category);
+            workoutData.put("focus_area", entry.getValue().getFocusArea());
+            workoutData.put("equipment", entry.getValue().getEquipment());
+            workoutData.put("preparation", entry.getValue().getPreparation());
+            workoutData.put("execution", entry.getValue().getExecution());
+
+            // Save to `default_workouts` collection using the workout name as document ID
+            db.collection("default_workouts").document(workoutName)
+                    .set(workoutData)
+                    .addOnSuccessListener(aVoid ->
+                            Log.d("Firestore", "Workout saved: " + workoutName))
+                    .addOnFailureListener(e ->
+                            Log.e("Firestore", "Error saving workout: " + workoutName, e));
+        }
+    }
+
+
 
 
     private void filterWorkoutsByCategory(String category, Map<String, Workout> defaultWorkouts) {
@@ -479,9 +534,10 @@ public class ExerciseFragment extends Fragment {
     private void setButtonListeners() {
         addExerciseButton.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), AddExerciseActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, 1); // Request code 1 for adding a new exercise
         });
     }
+
 
     private void filterWorkoutsBySearch(String query) {
         // Clear the workout container first

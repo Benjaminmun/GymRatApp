@@ -1,30 +1,19 @@
 package student.inti.gymratdev3;
 
-import android.widget.ArrayAdapter;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,13 +26,13 @@ public class EditUserTrainingActivity extends AppCompatActivity {
     private Button addExerciseButton, saveTrainingButton;
     private int exerciseCount = 0;
     private static final int MAX_EXERCISES = 10;
-    private static final int MAX_EXERCISE_NAME_LENGTH = 30;
-    private ArrayList<String> exerciseNames = new ArrayList<>();
-
 
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
     private ProgressDialog progressDialog;
+
+    // Store default and custom exercises
+    private ArrayList<String> availableExercises = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +45,7 @@ public class EditUserTrainingActivity extends AppCompatActivity {
         addExerciseButton = findViewById(R.id.add_exercise_button);
         saveTrainingButton = findViewById(R.id.save_training_button);
 
-        // Initialize Firestore and get current user
+        // Initialize Firestore and user
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -65,14 +54,10 @@ public class EditUserTrainingActivity extends AppCompatActivity {
         progressDialog.setMessage("Saving training...");
         progressDialog.setCancelable(false);
 
-        // Retrieve the initial training name if passed from the previous activity
-        String initialTrainingName = getIntent().getStringExtra("TRAINING_NAME");
-        if (initialTrainingName != null) {
-            trainingNameEditText.setText(initialTrainingName);
-        }
+        // Load available exercises (both default and custom)
+        loadAvailableExercises();
 
-
-        // Add listener to the Add Exercise button
+        // Handle Add Exercise button click
         addExerciseButton.setOnClickListener(v -> {
             if (exerciseCount < MAX_EXERCISES) {
                 addExerciseField();
@@ -81,54 +66,79 @@ public class EditUserTrainingActivity extends AppCompatActivity {
             }
         });
 
-        // Save button listener
-        saveTrainingButton.setOnClickListener(v -> saveTrainingToFirestore());
-        loadExerciseNames();
-
+        // Save button listener with delayed trigger to capture latest input
+        saveTrainingButton.setOnClickListener(v -> {
+            trainingNameEditText.clearFocus();  // Ensure input is captured
+            saveTrainingButton.postDelayed(this::saveTrainingToFirestore, 50);
+        });
     }
 
-    // Method to query exercise names from Firestore and populate exerciseNames list
-    private void loadExerciseNames() {
-        if (currentUser == null) {
-            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    // Load available exercises from Firestore (default workouts + user custom exercises)
+    private void loadAvailableExercises() {
+        availableExercises.clear(); // Clear previous data to avoid duplication
 
-        db.collection("users").document(currentUser.getUid())
-                .collection("custom_exercises")
+        // Load default workouts from Firestore's `default_workouts` collection
+        db.collection("default_workouts")
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    exerciseNames.clear();
-                    for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
-                        String exerciseName = document.getString("exerciseName");
-                        if (exerciseName != null) {
-                            exerciseNames.add(exerciseName);
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot doc : task.getResult()) {
+                            String exerciseName = doc.getString("exercise_name");
+                            if (exerciseName != null) {
+                                availableExercises.add(exerciseName);
+                            }
                         }
+                        // After loading default workouts, load custom exercises
+                        loadCustomExercises();
+                    } else {
+                        Toast.makeText(this, "Failed to load default workouts.", Toast.LENGTH_SHORT).show();
                     }
-                    // Call loadTrainingState only after exerciseNames is populated
-                    loadTrainingState();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to load exercises", Toast.LENGTH_SHORT).show();
                 });
     }
 
-    // Method to add a new exercise input field with the Spinner for exercise selection
+    // Load user custom exercises from Firestore
+    private void loadCustomExercises() {
+        if (currentUser != null) {
+            db.collection("users").document(currentUser.getUid()).collection("custom_exercises")
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                String exerciseName = doc.getString("exercise_name");
+                                if (exerciseName != null) {
+                                    availableExercises.add(exerciseName);
+                                }
+                            }
+                        } else {
+                            Toast.makeText(this, "Failed to load custom exercises.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+    }
+
+    // Add a new exercise input field with a dropdown Spinner for exercise selection
     private void addExerciseField() {
         LinearLayout exerciseLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.exercise_input_layout, null);
-        Spinner exerciseSpinner = exerciseLayout.findViewById(R.id.exercise_edit_text);
+
+        Spinner exerciseSpinner = exerciseLayout.findViewById(R.id.exercise_spinner);
         EditText repsEditText = exerciseLayout.findViewById(R.id.reps_edit_text);
         EditText setsEditText = exerciseLayout.findViewById(R.id.sets_edit_text);
 
-
-
-        // Set the ArrayAdapter to populate the exercise spinner
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, exerciseNames);
+        // Set up the exercise spinner with the available exercises
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, availableExercises);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         exerciseSpinner.setAdapter(adapter);
 
+        // Add validation for reps and sets input fields
+        validateRepsAndSets(repsEditText, setsEditText);
 
-        // Add real-time validation for reps and sets
+        // Add the new exercise layout to the container
+        exercisesContainer.addView(exerciseLayout);
+        exerciseCount++;
+    }
+
+    // Real-time validation for reps and sets input
+    private void validateRepsAndSets(EditText repsEditText, EditText setsEditText) {
         repsEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -158,32 +168,16 @@ public class EditUserTrainingActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {}
         });
-
-        exercisesContainer.addView(exerciseLayout);
-        exerciseCount++;
     }
 
-
-    // Overriding the back button to ask whether the user wants to save the changes
-    @Override
-    public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setMessage("Do you want to save changes?")
-                .setPositiveButton("Yes", (dialog, which) -> saveTrainingToFirestore())
-                .setNegativeButton("No", (dialog, which) -> {
-                    clearTrainingState();  // Clear saved state if user chooses not to save
-                    super.onBackPressed();
-                })
-                .show();
-    }
-
-    // Inside saveTrainingToFirestore, update to retrieve selected exercise names from the Spinner
+    // Save training and exercises to Firestore
     private void saveTrainingToFirestore() {
         if (currentUser == null) {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // Trim the input to avoid issues with whitespace
         String trainingName = trainingNameEditText.getText().toString().trim();
         if (trainingName.isEmpty()) {
             Toast.makeText(this, "Training name cannot be empty", Toast.LENGTH_SHORT).show();
@@ -193,16 +187,16 @@ public class EditUserTrainingActivity extends AppCompatActivity {
         ArrayList<Map<String, Object>> exercises = new ArrayList<>();
         for (int i = 0; i < exercisesContainer.getChildCount(); i++) {
             View view = exercisesContainer.getChildAt(i);
-            Spinner exerciseSpinner = view.findViewById(R.id.exercise_edit_text);
+            Spinner exerciseSpinner = view.findViewById(R.id.exercise_spinner);
             EditText repsEditText = view.findViewById(R.id.reps_edit_text);
             EditText setsEditText = view.findViewById(R.id.sets_edit_text);
 
             String exercise = exerciseSpinner.getSelectedItem().toString();
-            String reps = repsEditText.getText().toString().trim();
-            String sets = setsEditText.getText().toString().trim();
+            String reps = repsEditText.getText().toString();
+            String sets = setsEditText.getText().toString();
 
-            if (exercise.isEmpty() || reps.isEmpty() || sets.isEmpty()) {
-                Toast.makeText(this, "Exercise, reps, and sets cannot be empty.", Toast.LENGTH_SHORT).show();
+            if (reps.isEmpty() || sets.isEmpty()) {
+                Toast.makeText(this, "Reps and sets cannot be empty.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -214,76 +208,35 @@ public class EditUserTrainingActivity extends AppCompatActivity {
             exercises.add(exerciseData);
         }
 
-        // Save to Firestore as before
-    }
-
-    // Save the current state of the activity in SharedPreferences
-    private void saveTrainingState() {
-        SharedPreferences prefs = getSharedPreferences("UserTraining", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("trainingName", trainingNameEditText.getText().toString());
-
-        // Save exercises, reps, and sets
-        editor.putInt("exerciseCount", exerciseCount);
-        for (int i = 0; i < exercisesContainer.getChildCount(); i++) {
-            View view = exercisesContainer.getChildAt(i);
-            EditText exerciseEditText = view.findViewById(R.id.exercise_edit_text);
-            EditText repsEditText = view.findViewById(R.id.reps_edit_text);
-            EditText setsEditText = view.findViewById(R.id.sets_edit_text);
-
-            editor.putString("exercise_" + i, exerciseEditText.getText().toString());
-            editor.putString("reps_" + i, repsEditText.getText().toString());
-            editor.putString("sets_" + i, setsEditText.getText().toString());
+        if (exercises.isEmpty()) {
+            Toast.makeText(this, "At least one exercise must be added.", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        editor.apply();
+        Map<String, Object> trainingData = new HashMap<>();
+        trainingData.put("userId", currentUser.getUid());
+        trainingData.put("trainingName", trainingName);
+        trainingData.put("exercises", exercises);
+
+        progressDialog.show();
+        db.collection("trainings").add(trainingData)
+                .addOnSuccessListener(documentReference -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(this, "Training saved successfully", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(this, "Error saving training", Toast.LENGTH_SHORT).show();
+                });
     }
 
-    // Load the saved state when the activity resumes
-    private void loadTrainingState() {
-        SharedPreferences prefs = getSharedPreferences("UserTraining", MODE_PRIVATE);
-        String savedTrainingName = prefs.getString("trainingName", "");
-        trainingNameEditText.setText(savedTrainingName);
-
-        int savedExerciseCount = prefs.getInt("exerciseCount", 0);
-        for (int i = 0; i < savedExerciseCount; i++) {
-            String exerciseName = prefs.getString("exercise_" + i, "");
-            String reps = prefs.getString("reps_" + i, "");
-            String sets = prefs.getString("sets_" + i, "");
-
-            if (!exerciseName.isEmpty() && !reps.isEmpty() && !sets.isEmpty()) {
-                // Add exercise field and set up the adapter for Spinner
-                addExerciseField();
-
-                View lastExerciseView = exercisesContainer.getChildAt(i);
-                Spinner lastExerciseSpinner = lastExerciseView.findViewById(R.id.exercise_edit_text);
-                EditText lastRepsEditText = lastExerciseView.findViewById(R.id.reps_edit_text);
-                EditText lastSetsEditText = lastExerciseView.findViewById(R.id.sets_edit_text);
-
-                // Set ArrayAdapter for the Spinner
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, exerciseNames);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                lastExerciseSpinner.setAdapter(adapter);
-
-                // Set the saved values
-                lastRepsEditText.setText(reps);
-                lastSetsEditText.setText(sets);
-
-                // Set the selected exercise name if it exists in the adapter
-                int position = adapter.getPosition(exerciseName);
-                if (position >= 0) {
-                    lastExerciseSpinner.setSelection(position);
-                }
-            }
-        }
-    }
-
-
-    // Clear the saved state
-    private void clearTrainingState() {
-        SharedPreferences prefs = getSharedPreferences("UserTraining", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.clear();
-        editor.apply();
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setMessage("Do you want to save changes?")
+                .setPositiveButton("Yes", (dialog, which) -> saveTrainingToFirestore())
+                .setNegativeButton("No", (dialog, which) -> super.onBackPressed())
+                .show();
     }
 }

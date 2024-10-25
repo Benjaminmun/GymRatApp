@@ -3,21 +3,28 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- Focus Area options -->
+
     <string-array name="focus_areas">
-        <item>Arms</item>
+        <item>Biceps</item>
+        <item>Triceps</item>
+        <item>Chest</item>
         <item>Back</item>
         <item>Legs</item>
-        <item>Core</item>
+        <item>Abs</item>
+        <item>Shoulders</item>
         <item>Full Body</item>
     </string-array>
 
     <!-- Equipment options -->
-    <string-array name="equipment_options">
-        <item>Barbell</item>
-        <item>Dumbbells</item>
+    <string-array name="equipment_types">
         <item>Bodyweight</item>
-        <item>Resistance Bands</item>
+        <item>Dumbbell</item>
+        <item>Barbell</item>
+        <item>Cable</item>
+        <item>Kettlebell</item>
+        <item>Resistance Band</item>
         <item>Machine</item>
+        <item>None</item>
     </string-array>
 
     <!-- Category options -->
@@ -32,6 +39,13 @@
     <string-array name="exercise_categories">
         <item>Arms</item>
         <item>Back</item>
+        <item>Legs</item>
+        <item>Chest</item>
+        <item>Core</item>
+        <item>Glutes</item>
+        <item>Shoulders</item>
+        <item>Full Body</item>
+        <item>Cardio</item>
         <item>Olympic</item>
     </string-array>
 

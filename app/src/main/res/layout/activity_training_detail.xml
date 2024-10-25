@@ -65,16 +65,6 @@
             android:padding="8dp"
             android:background="@drawable/rounded_edittext"
             android:gravity="center_vertical">
-
-            <!-- Placeholder text when no exercises are available -->
-            <TextView
-                android:id="@+id/no_exercises_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="No exercises available"
-                android:textSize="16sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_gravity="center" />
         </LinearLayout>
     </ScrollView>
 
@@ -84,16 +74,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Start Workout"
-        android:layout_gravity="center"
-        android:background="@drawable/button_gradient"
         android:textColor="@android:color/white"
-        android:padding="16dp"
         android:textSize="18sp"
+        android:padding="16dp"
+        android:background="@drawable/button_gradient"
         android:drawableEnd="@drawable/ic_play"
         android:drawablePadding="8dp"
         android:elevation="4dp"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        android:layout_gravity="center" />
 
+    <!-- Progress Bar -->
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"

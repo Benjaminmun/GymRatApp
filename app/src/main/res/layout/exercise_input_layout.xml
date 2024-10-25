@@ -1,20 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:paddingBottom="8dp">
 
-    <!-- Exercise Name Field -->
+    <!-- Exercise Spinner -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
-        android:hint="Exercise Name">
+        android:hint="Select Exercise">
 
         <Spinner
-            android:id="@+id/exercise_edit_text"
+            android:id="@+id/exercise_spinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Reps Field -->
