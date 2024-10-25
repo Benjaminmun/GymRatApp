@@ -5,12 +5,12 @@
     android:orientation="vertical"
     android:padding="24dp">
 
-    <EditText
+    <Spinner
         android:id="@+id/exercise_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Exercise Name"
-        android:inputType="text" />
+         />
 
     <EditText
         android:id="@+id/exercise_reps"
