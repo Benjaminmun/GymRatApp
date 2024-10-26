@@ -27,8 +27,11 @@ public class TrainingDetailActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
     private String trainingId;
+
     private final List<View> exerciseViews = new ArrayList<>();
     private final List<String> availableExercises = new ArrayList<>();
+
+    private boolean isDataChanged = false; // Track if user has made changes
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,21 +44,38 @@ public class TrainingDetailActivity extends AppCompatActivity {
         loadExercises();
 
         // Set listeners
-        addExerciseButton.setOnClickListener(v -> addExerciseField());
-        removeExerciseButton.setOnClickListener(v -> removeLastExercise());
-        startWorkoutButton.setOnClickListener(v -> saveAndNavigateToWorkout());
+        addExerciseButton.setOnClickListener(v -> {
+            addExerciseField();
+            isDataChanged = true; // Mark as changed when user adds an exercise
+        });
+
+        removeExerciseButton.setOnClickListener(v -> {
+            removeLastExercise();
+            isDataChanged = true; // Mark as changed when user removes an exercise
+        });
+
+        startWorkoutButton.setOnClickListener(v -> {
+            if (isDataChanged) {
+                Log.d(TAG, "Changes detected. Saving and starting workout...");
+                saveAndNavigateToWorkout();
+            } else {
+                Log.d(TAG, "No changes detected. Navigating to workout...");
+                navigateToWorkout(); // No changes, navigate directly
+            }
+        });
     }
 
-    // Initialize UI components
     private void initializeUI() {
         exercisesLayout = findViewById(R.id.exercises_layout);
         addExerciseButton = findViewById(R.id.add_exercise_button);
         removeExerciseButton = findViewById(R.id.remove_exercise_button);
         startWorkoutButton = findViewById(R.id.start_workout_button);
         progressBar = findViewById(R.id.progress_bar);
+
+        startWorkoutButton.setEnabled(true);
+        startWorkoutButton.setVisibility(View.VISIBLE);
     }
 
-    // Setup Firestore and current user
     private void setupFirestore() {
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -67,7 +87,6 @@ public class TrainingDetailActivity extends AppCompatActivity {
         }
     }
 
-    // Load existing exercises from Firestore
     private void loadExercises() {
         progressBar.setVisibility(View.VISIBLE);
 
@@ -86,7 +105,6 @@ public class TrainingDetailActivity extends AppCompatActivity {
                 });
     }
 
-    // Display all exercises from Firestore
     private void displayExercises(List<Map<String, Object>> exercises) {
         for (Map<String, Object> exercise : exercises) {
             String name = (String) exercise.get("exercise");
@@ -96,7 +114,6 @@ public class TrainingDetailActivity extends AppCompatActivity {
         }
     }
 
-    // Dynamically add an existing exercise view
     private void addExerciseView(String name, int reps, int sets) {
         View exerciseView = LayoutInflater.from(this)
                 .inflate(R.layout.exercise_input_training_details, exercisesLayout, false);
@@ -109,11 +126,14 @@ public class TrainingDetailActivity extends AppCompatActivity {
         repsEditText.setText(String.valueOf(reps));
         setsEditText.setText(String.valueOf(sets));
 
+        // Monitor changes in reps or sets to mark the data as changed
+        repsEditText.addTextChangedListener(createTextWatcher());
+        setsEditText.addTextChangedListener(createTextWatcher());
+
         exercisesLayout.addView(exerciseView);
         exerciseViews.add(exerciseView);
     }
 
-    // Add a new exercise field dynamically
     private void addExerciseField() {
         View exerciseLayout = getLayoutInflater()
                 .inflate(R.layout.exercise_input_training_details_added, exercisesLayout, false);
@@ -121,18 +141,12 @@ public class TrainingDetailActivity extends AppCompatActivity {
         Spinner exerciseSpinner = exerciseLayout.findViewById(R.id.exercise_spinner);
         setupExerciseSpinner(exerciseSpinner);
 
-        // Set up the exercise spinner with the available exercises
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, availableExercises);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        exerciseSpinner.setAdapter(adapter);
-
         exercisesLayout.addView(exerciseLayout);
         exerciseViews.add(exerciseLayout);
 
         Log.d(TAG, "Added new exercise field.");
     }
 
-    // Remove the last added exercise
     private void removeLastExercise() {
         if (!exerciseViews.isEmpty()) {
             View lastExercise = exerciseViews.remove(exerciseViews.size() - 1);
@@ -142,7 +156,6 @@ public class TrainingDetailActivity extends AppCompatActivity {
         }
     }
 
-    // Setup the exercise spinner with available exercises
     private void setupExerciseSpinner(Spinner spinner) {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, availableExercises);
@@ -150,7 +163,6 @@ public class TrainingDetailActivity extends AppCompatActivity {
         spinner.setAdapter(adapter);
     }
 
-    // Load available exercises from Firestore
     private void loadAvailableExercises() {
         db.collection("default_workouts").get()
                 .addOnCompleteListener(task -> {
@@ -159,14 +171,12 @@ public class TrainingDetailActivity extends AppCompatActivity {
                             String exerciseName = doc.getString("exercise_name");
                             if (exerciseName != null) availableExercises.add(exerciseName);
                         }
-                        if (availableExercises.isEmpty()) showError("No available exercises found.");
                     } else {
                         showError("Failed to load available exercises.");
                     }
                 });
     }
 
-    // Save exercises and navigate to StartWorkoutActivity
     private void saveAndNavigateToWorkout() {
         List<Map<String, Object>> exercises = new ArrayList<>();
 
@@ -197,16 +207,30 @@ public class TrainingDetailActivity extends AppCompatActivity {
                 });
     }
 
-    // Navigate to the workout activity
     private void navigateToWorkout() {
         Intent intent = new Intent(this, StartWorkoutActivity.class);
-        startActivity(intent);
         intent.putExtra("TRAINING_ID", trainingId);
+        startActivity(intent);
         finish();
     }
 
-    // Show error message
     private void showError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    // Helper method to track changes in EditText fields
+    private TextWatcher createTextWatcher() {
+        return new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                isDataChanged = true; // Mark data as changed if user edits text
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
     }
 }
