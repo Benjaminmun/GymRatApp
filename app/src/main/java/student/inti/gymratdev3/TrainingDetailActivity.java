@@ -2,6 +2,7 @@ package student.inti.gymratdev3;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -27,6 +28,9 @@ public class TrainingDetailActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
     private String trainingId;
+
+    private Handler saveHandler = new Handler();
+    private Runnable saveRunnable;
 
     private final List<View> exerciseViews = new ArrayList<>();
     private final List<String> availableExercises = new ArrayList<>();
@@ -64,6 +68,8 @@ public class TrainingDetailActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     private void initializeUI() {
         exercisesLayout = findViewById(R.id.exercises_layout);
@@ -139,22 +145,35 @@ public class TrainingDetailActivity extends AppCompatActivity {
                 .inflate(R.layout.exercise_input_training_details_added, exercisesLayout, false);
 
         Spinner exerciseSpinner = exerciseLayout.findViewById(R.id.exercise_spinner);
+        EditText repsEditText = exerciseLayout.findViewById(R.id.reps_edit_text);
+        EditText setsEditText = exerciseLayout.findViewById(R.id.sets_edit_text);
+
         setupExerciseSpinner(exerciseSpinner);
+
+        // Monitor changes in reps or sets to mark the data as changed
+        repsEditText.addTextChangedListener(createTextWatcher());
+        setsEditText.addTextChangedListener(createTextWatcher());
 
         exercisesLayout.addView(exerciseLayout);
         exerciseViews.add(exerciseLayout);
 
+        isDataChanged = true; // Mark data as changed when user adds an exercise
+        scheduleSave();
         Log.d(TAG, "Added new exercise field.");
     }
+
 
     private void removeLastExercise() {
         if (!exerciseViews.isEmpty()) {
             View lastExercise = exerciseViews.remove(exerciseViews.size() - 1);
             exercisesLayout.removeView(lastExercise);
+            isDataChanged = true; // Mark data as changed when user removes an exercise
+            scheduleSave();
         } else {
             showError("No exercises to remove.");
         }
     }
+
 
     private void setupExerciseSpinner(Spinner spinner) {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
@@ -178,17 +197,44 @@ public class TrainingDetailActivity extends AppCompatActivity {
     }
 
     private void saveAndNavigateToWorkout() {
+        saveExercises(() -> navigateToWorkout());
+    }
+
+    private void saveExercises(Runnable onSuccess) {
         List<Map<String, Object>> exercises = new ArrayList<>();
 
         for (View view : exerciseViews) {
             Spinner spinner = view.findViewById(R.id.exercise_spinner);
+            TextView exerciseNameText = view.findViewById(R.id.exercise_name_text_view1);
             EditText repsEditText = view.findViewById(R.id.reps_edit_text);
+            if (repsEditText == null) {
+                repsEditText = view.findViewById(R.id.reps_edit_text1);
+            }
             EditText setsEditText = view.findViewById(R.id.sets_edit_text);
+            if (setsEditText == null) {
+                setsEditText = view.findViewById(R.id.sets_edit_text1);
+            }
 
             Map<String, Object> exerciseData = new HashMap<>();
-            exerciseData.put("exercise", spinner.getSelectedItem().toString());
-            exerciseData.put("reps", Integer.parseInt(repsEditText.getText().toString()));
-            exerciseData.put("sets", Integer.parseInt(setsEditText.getText().toString()));
+            if (spinner != null) {
+                // New exercise added
+                exerciseData.put("exercise", spinner.getSelectedItem().toString());
+            } else if (exerciseNameText != null) {
+                // Existing exercise
+                exerciseData.put("exercise", exerciseNameText.getText().toString());
+            } else {
+                continue; // Skip if neither spinner nor text view is found
+            }
+
+            try {
+                int reps = Integer.parseInt(repsEditText.getText().toString());
+                int sets = Integer.parseInt(setsEditText.getText().toString());
+                exerciseData.put("reps", reps);
+                exerciseData.put("sets", sets);
+            } catch (NumberFormatException e) {
+                showError("Invalid number format in reps or sets.");
+                continue;
+            }
 
             exercises.add(exerciseData);
         }
@@ -199,13 +245,17 @@ public class TrainingDetailActivity extends AppCompatActivity {
                 .update("exercises", exercises)
                 .addOnSuccessListener(aVoid -> {
                     progressBar.setVisibility(View.GONE);
-                    navigateToWorkout();
+                    isDataChanged = false; // Reset the flag
+                    if (onSuccess != null) {
+                        onSuccess.run();
+                    }
                 })
                 .addOnFailureListener(e -> {
                     progressBar.setVisibility(View.GONE);
                     showError("Failed to save exercises.");
                 });
     }
+
 
     private void navigateToWorkout() {
         Intent intent = new Intent(this, StartWorkoutActivity.class);
@@ -227,10 +277,23 @@ public class TrainingDetailActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 isDataChanged = true; // Mark data as changed if user edits text
+                // Remove any pending saves
+                saveHandler.removeCallbacks(saveRunnable);
+                // Schedule a new save after a delay
+                saveRunnable = () -> saveExercises(null);
+                saveHandler.postDelayed(saveRunnable, 2000); // Save after 2 seconds of inactivity
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         };
+    }
+
+    private void scheduleSave() {
+        // Remove any pending saves
+        saveHandler.removeCallbacks(saveRunnable);
+        // Schedule a new save after a delay
+        saveRunnable = () -> saveExercises(null);
+        saveHandler.postDelayed(saveRunnable, 2000); // Save after 2 seconds
     }
 }

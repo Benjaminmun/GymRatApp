@@ -49,11 +49,11 @@
 
     <!-- Horizontal Scrollable Filter Buttons -->
     <HorizontalScrollView
+        android:id="@+id/filter_buttons_scrollview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:visibility="gone"
-        android:id="@+id/filter_buttons_scrollview">
+        android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/filter_buttons_container"
@@ -105,11 +105,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="All"
-                android:background="@drawable/button_gradient"
                 android:textColor="#fff"
-                android:layout_marginEnd="8dp"/>
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
 
-            <!-- Additional Buttons for other categories -->
+            <!-- Additional Buttons -->
             <Button
                 android:id="@+id/chest_category_button"
                 style="@style/MyButton"
@@ -158,9 +158,27 @@
                 android:text="Legs"
                 android:textColor="#fff"
                 android:background="@drawable/button_gradient" />
+
+            <Button
+                android:id="@+id/fullbody_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Full Body"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/cardio_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cardio"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient" />
         </LinearLayout>
     </HorizontalScrollView>
-
 
     <!-- Scrollable Container for Workout Buttons -->
     <ScrollView

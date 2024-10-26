@@ -11,10 +11,40 @@
         android:id="@+id/report_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Workout Progress"
+        android:text="Report"
         android:textSize="24sp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp" />
+
+    <!-- Stats Section in a Single Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp"
+        android:weightSum="2">
+
+        <!-- Total Minutes -->
+        <TextView
+            android:id="@+id/total_minutes_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Total Workout Time: 0 mins"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Total Exercises -->
+        <TextView
+            android:id="@+id/total_exercises_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Total Exercises: 0"
+            android:textSize="18sp"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
 
     <!-- RecyclerView to Display Workout History -->
     <androidx.recyclerview.widget.RecyclerView

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,12 +15,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +31,7 @@ public class ReportFragment extends Fragment {
     private WorkoutHistoryAdapter adapter;
     private List<Map<String, Object>> workoutHistoryList = new ArrayList<>();
 
+    private TextView totalMinutesTextView, totalExercisesTextView; // New Stats Views
     private static final String TAG = "ReportFragment";
 
     @Nullable
@@ -45,6 +46,8 @@ public class ReportFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         workoutHistoryRecycler = view.findViewById(R.id.workout_history_recycler);
         refreshButton = view.findViewById(R.id.refresh_button);
+        totalMinutesTextView = view.findViewById(R.id.total_minutes_text_view); // New
+        totalExercisesTextView = view.findViewById(R.id.total_exercises_text_view); // New
 
         // Set up RecyclerView
         workoutHistoryRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -60,16 +63,37 @@ public class ReportFragment extends Fragment {
         return view;
     }
 
-    // Load workout history from Firestore
+    // Load workout history for the logged-in user
     private void loadWorkoutHistory() {
-        db.collection("workout_history")
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Get user ID
+
+        db.collection("users")
+                .document(userId)
+                .collection("workout_history")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         workoutHistoryList.clear(); // Clear old data
+                        int totalMinutes = 0;
+                        int totalExercises = 0;
+
                         for (QueryDocumentSnapshot doc : task.getResult()) {
-                            workoutHistoryList.add(doc.getData()); // Add new data
+                            Map<String, Object> data = doc.getData();
+                            workoutHistoryList.add(data); // Add new data
+
+                            // Calculate total minutes and exercises
+                            if (data.containsKey("time")) {
+                                totalMinutes += ((Long) data.get("time")).intValue(); // Time in mins
+                            }
+                            if (data.containsKey("exercises")) {
+                                totalExercises += ((List<?>) data.get("exercises")).size(); // Exercise count
+                            }
                         }
+
+                        // Update Stats Views
+                        totalMinutesTextView.setText(String.format("Total Workout Time: %d mins", totalMinutes));
+                        totalExercisesTextView.setText(String.format("Total Exercises: %d", totalExercises));
+
                         adapter.notifyDataSetChanged(); // Refresh the RecyclerView
                         Log.d(TAG, "Workout history loaded.");
                     } else {
