@@ -3,36 +3,36 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingBottom="8dp">
+    android:padding="8dp"
+    android:gravity="center_vertical"
+    android:baselineAligned="false">
 
-    <!-- Exercise Spinner -->
-    <com.google.android.material.textfield.TextInputLayout
+    <!-- Exercise Name TextView -->
+    <TextView
+        android:id="@+id/exercise_name_text_view1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:hint="Select Exercise">
-
-        <Spinner
-            android:id="@+id/exercise_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:spinnerMode="dropdown" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-
+        android:layout_weight="1"
+        android:text="Exercise Name"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp" />
 
     <!-- Reps Field -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:hint="Reps">
+        android:hint="Reps"
+        android:paddingEnd="8dp">
 
         <EditText
-            android:id="@+id/reps_edit_text"
+            android:id="@+id/reps_edit_text1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="number" />
+            android:inputType="number"
+            android:gravity="center" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Sets Field -->
@@ -43,10 +43,11 @@
         android:hint="Sets">
 
         <EditText
-            android:id="@+id/sets_edit_text"
+            android:id="@+id/sets_edit_text1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="number" />
+            android:inputType="number"
+            android:gravity="center" />
     </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

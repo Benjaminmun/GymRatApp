@@ -1,16 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#aaaaaa"
-    tools:context=".ReportFragment">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
 
+    <!-- Header Section -->
     <TextView
+        android:id="@+id/report_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Report Fragment"
-        android:textSize="26dp"
-        android:layout_gravity="center" />
+        android:text="Workout Progress"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
 
-</FrameLayout>
+    <!-- RecyclerView to Display Workout History -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/workout_history_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false" />
+
+    <!-- Button to Refresh Data -->
+    <Button
+        android:id="@+id/refresh_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Refresh Data"
+        android:backgroundTint="@android:color/holo_blue_dark"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="8dp" />
+</LinearLayout>
