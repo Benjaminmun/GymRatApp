@@ -55,10 +55,8 @@
             android:orientation="vertical"
             android:padding="8dp"
             android:background="@drawable/rounded_edittext"
-            android:gravity="center_vertical">
-        </LinearLayout>
+            android:gravity="center_vertical" />
     </ScrollView>
-
 
     <!-- Start Workout Button -->
     <Button
@@ -69,7 +67,8 @@
         android:backgroundTint="@color/teal_700"
         android:textColor="@android:color/white"
         android:drawableEnd="@drawable/ic_play"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        android:enabled="false" />
 
     <!-- Loading Progress Bar -->
     <ProgressBar
