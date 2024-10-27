@@ -37,7 +37,7 @@ public class ExerciseFragment extends Fragment {
 
     private Button filterArmsButton, filterBackButton, filterOlympicButton, filterLegButton,
             filterChestButton, filterCoreButton, filterGlutesButton, filterShouldersButton,
-            filterAllButton, addExerciseButton;
+            filterFullBodyButton, filterCardioButton, filterAllButton, addExerciseButton;
     private LinearLayout workoutContainer, filterButtonsContainer;
     private FirebaseFirestore db;
     private String userId;
@@ -54,6 +54,8 @@ public class ExerciseFragment extends Fragment {
     private final Map<String, Workout> defaultCoreWorkouts = new HashMap<>();
     private final Map<String, Workout> defaultGlutesWorkouts = new HashMap<>();
     private final Map<String, Workout> defaultShouldersWorkouts = new HashMap<>();
+    private final Map<String, Workout> defaultFullBodyWorkouts = new HashMap<>();
+    private final Map<String, Workout> defaultCardioWorkouts = new HashMap<>();
 
     public ExerciseFragment() {
         // Required empty public constructor
@@ -127,6 +129,8 @@ public class ExerciseFragment extends Fragment {
         filterCoreButton = view.findViewById(R.id.core_category_button);
         filterGlutesButton = view.findViewById(R.id.glutes_category_button);
         filterShouldersButton = view.findViewById(R.id.shoulder_category_button);
+        filterFullBodyButton = view.findViewById(R.id.fullbody_category_button);
+        filterCardioButton = view.findViewById(R.id.cardio_category_button);
         filterAllButton = view.findViewById(R.id.filter_all_button);
         workoutContainer = view.findViewById(R.id.workout_container);
         filterButtonsContainer = view.findViewById(R.id.filter_buttons_container);
@@ -274,6 +278,8 @@ public class ExerciseFragment extends Fragment {
         filterCoreButton.setOnClickListener(v -> filterWorkoutsByCategory("Core", defaultCoreWorkouts));
         filterGlutesButton.setOnClickListener(v -> filterWorkoutsByCategory("Glutes", defaultGlutesWorkouts));
         filterShouldersButton.setOnClickListener(v -> filterWorkoutsByCategory("Shoulders", defaultShouldersWorkouts));
+        filterCardioButton.setOnClickListener(v -> filterWorkoutsByCategory("Cardio", defaultCardioWorkouts));
+        filterFullBodyButton.setOnClickListener(v -> filterWorkoutsByCategory("Full Body", defaultFullBodyWorkouts));
         filterAllButton.setOnClickListener(v -> loadAllWorkouts());
     }
 
@@ -297,10 +303,12 @@ public class ExerciseFragment extends Fragment {
         addWorkoutCategory("Core", defaultCoreWorkouts);
         addWorkoutCategory("Glutes", defaultGlutesWorkouts);
         addWorkoutCategory("Shoulders", defaultShouldersWorkouts);
+        addWorkoutCategory("Full Body", defaultFullBodyWorkouts);
+        addWorkoutCategory("Cardio", defaultCardioWorkouts);
     }
 
     private void saveDefaultWorkoutsToGlobalCollection() {
-        // Check if the `default_workouts` collection is empty
+        // Check if the default_workouts collection is empty
         db.collection("default_workouts").get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult().isEmpty()) {
@@ -314,6 +322,8 @@ public class ExerciseFragment extends Fragment {
                         saveWorkoutCategoryToFirestore("Core", defaultCoreWorkouts);
                         saveWorkoutCategoryToFirestore("Glutes", defaultGlutesWorkouts);
                         saveWorkoutCategoryToFirestore("Shoulders", defaultShouldersWorkouts);
+                        saveWorkoutCategoryToFirestore("Full Body", defaultFullBodyWorkouts);
+                        saveWorkoutCategoryToFirestore("Cardio", defaultCardioWorkouts);
                     } else {
                         Log.d("Firestore", "Default workouts already exist.");
                     }
@@ -332,7 +342,7 @@ public class ExerciseFragment extends Fragment {
             workoutData.put("preparation", entry.getValue().getPreparation());
             workoutData.put("execution", entry.getValue().getExecution());
 
-            // Save to `default_workouts` collection using the workout name as document ID
+            // Save to default_workouts collection using the workout name as document ID
             db.collection("default_workouts").document(workoutName)
                     .set(workoutData)
                     .addOnSuccessListener(aVoid ->
@@ -553,11 +563,27 @@ public class ExerciseFragment extends Fragment {
         Map<String, Workout> filteredArmsWorkouts = filterWorkouts(defaultArmsWorkouts, query);
         Map<String, Workout> filteredBackWorkouts = filterWorkouts(defaultBackWorkouts, query);
         Map<String, Workout> filteredOlympicWorkouts = filterWorkouts(defaultOlympicWorkouts, query);
+        Map<String, Workout> filteredLegWorkouts = filterWorkouts(defaultLegWorkouts, query);
+        Map<String, Workout> filteredChestWorkouts = filterWorkouts(defaultChestWorkouts, query);
+        Map<String, Workout> filteredCoreWorkouts = filterWorkouts(defaultCoreWorkouts, query);
+        Map<String, Workout> filteredGlutesWorkouts = filterWorkouts(defaultGlutesWorkouts, query);
+        Map<String, Workout> filteredShouldersWorkouts = filterWorkouts(defaultShouldersWorkouts, query);
+        Map<String, Workout> filteredFullBodyWorkouts = filterWorkouts(defaultFullBodyWorkouts, query);
+        Map<String, Workout> filteredCardioWorkouts = filterWorkouts(defaultCardioWorkouts, query);
+
+
 
         // Add filtered default workouts directly
         addDefaultWorkouts(filteredArmsWorkouts);
         addDefaultWorkouts(filteredBackWorkouts);
         addDefaultWorkouts(filteredOlympicWorkouts);
+        addDefaultWorkouts(filteredLegWorkouts);
+        addDefaultWorkouts(filteredChestWorkouts);
+        addDefaultWorkouts(filteredCoreWorkouts);
+        addDefaultWorkouts(filteredGlutesWorkouts);
+        addDefaultWorkouts(filteredShouldersWorkouts);
+        addDefaultWorkouts(filteredFullBodyWorkouts);
+        addDefaultWorkouts(filteredCardioWorkouts);
 
         // Fetch and add filtered user-created workouts directly
         fetchAndFilterUserWorkouts(query);
