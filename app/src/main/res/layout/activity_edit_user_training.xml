@@ -10,12 +10,20 @@
     android:background="@drawable/background_vector_white"
     tools:context=".EditUserTrainingActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Training Plan Name"
+        android:textSize="16sp"
+        android:textColor="#3100d4"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
     <!-- Training Name Input -->
     <EditText
         android:id="@+id/training_name_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Training Name"
+        android:hint="Enter name of training plan"
         android:background="@drawable/rounded_edittext"
         android:padding="16dp"
         android:textColor="#3100d4"
@@ -40,6 +48,7 @@
     <!-- Add Exercise Button -->
     <Button
         android:id="@+id/add_exercise_button"
+        style="@style/MyButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add Exercise"
@@ -54,6 +63,7 @@
     <!-- Save Training Button -->
     <Button
         android:id="@+id/save_training_button"
+        style="@style/MyButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Save Training"

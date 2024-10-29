@@ -20,25 +20,28 @@
 
         <Button
             android:id="@+id/add_exercise_button"
+            style="@style/MyButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Add Exercise"
-            android:backgroundTint="@color/teal_700"
+            android:text="Add
+                            Exercise"
+            android:background="@drawable/button_gradient"
             android:textColor="@android:color/white"
             android:drawableEnd="@drawable/ic_add"
             android:layout_marginEnd="8dp" />
 
         <Button
             android:id="@+id/remove_exercise_button"
+            style="@style/MyButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="Remove Exercise"
-            android:backgroundTint="@color/teal_700"
-            android:textColor="@android:color/white"
+            android:background="@drawable/button_red_gradient"
             android:drawableEnd="@drawable/ic_remove"
-            android:layout_marginStart="8dp" />
+            android:text="Remove Exercise"
+            android:textColor="@android:color/white" />
     </LinearLayout>
 
     <!-- Scrollable Exercise Layout -->
@@ -61,10 +64,11 @@
     <!-- Start Workout Button -->
     <Button
         android:id="@+id/start_workout_button"
+        style="@style/MyButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Workout"
-        android:backgroundTint="@color/teal_700"
+        android:text="Start Training"
+        android:background="@drawable/button_gradient"
         android:textColor="@android:color/white"
         android:drawableEnd="@drawable/ic_play"
         android:layout_marginBottom="8dp"

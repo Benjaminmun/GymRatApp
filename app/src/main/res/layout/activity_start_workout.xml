@@ -22,16 +22,17 @@
             android:textStyle="bold"
             android:gravity="center"
             android:layout_marginBottom="24dp"
-            android:textColor="@android:color/black" />
+            android:textColor="#3100d4" />
 
         <!-- Countdown Display -->
         <TextView
             android:id="@+id/countdownTextView"
+            style="@style/CountdownTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="3"
             android:textSize="150sp"
-            android:textColor="@android:color/holo_red_dark"
+            android:textColor="#3100d4"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
             android:layout_marginBottom="48dp"
@@ -44,7 +45,7 @@
             android:layout_height="wrap_content"
             android:text="00:00"
             android:textSize="56sp"
-            android:textColor="@android:color/black"
+            android:textColor="#3100d4"
             android:fontFamily="sans-serif-medium"
             android:layout_marginBottom="24dp"
             android:gravity="center"
@@ -68,21 +69,23 @@
 
             <Button
                 android:id="@+id/pauseButton"
+                style="@style/MyButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Pause"
-                android:backgroundTint="@android:color/holo_orange_light"
+                android:background="@drawable/button_gradient_alternate_orange"
                 android:textColor="@android:color/white"
                 android:layout_marginEnd="8dp" />
 
             <Button
                 android:id="@+id/finishButton"
+                style="@style/MyButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Finish"
-                android:backgroundTint="@android:color/holo_red_dark"
+                android:background="@drawable/button_gradient_alternate_green"
                 android:textColor="@android:color/white" />
         </LinearLayout>
     </LinearLayout>

@@ -14,6 +14,13 @@
         <item name="android:windowMinWidthMajor">80%</item> <!-- Width as percentage of screen -->
     </style>
 
+    <style name="CountdownTextStyle">
+        <item name="android:textColor">#FF4081</item> <!-- Pink Accent -->
+        <item name="android:textSize">48sp</item>      <!-- Large text size -->
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+
     <style name="BodyText" parent="TextAppearance.Material3.BodyLarge">
         <item name="android:textColor">@color/black</item>
     </style>

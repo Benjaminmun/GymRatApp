@@ -4,28 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:padding="8dp">
 
     <!-- Training Button -->
     <Button
         android:id="@+id/training_button"
+        style="@style/MyButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Training Name"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:background="@drawable/button_gradient_alternate"
-        android:textColor="@android:color/white"/>
+        android:textColor="@android:color/white"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"/>
 
     <!-- Remove Button -->
-    <Button
+    <ImageButton
         android:id="@+id/remove_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Remove"
-        android:textSize="14sp"
-        android:layout_marginStart="8dp"
-        android:visibility="gone"
-        android:background="@drawable/button_gradient"
-        android:textColor="@android:color/white"/>
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
 </LinearLayout>

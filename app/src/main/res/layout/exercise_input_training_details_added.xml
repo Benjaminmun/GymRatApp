@@ -20,17 +20,19 @@
 
         <Spinner
             android:id="@+id/exercise_spinner"
-            android:layout_width="132dp"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:spinnerMode="dropdown" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/CustomTextInputLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:hint="Reps"
+        android:textColorHint="#978cbd"
         android:paddingEnd="8dp">
 
         <EditText
@@ -38,14 +40,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"
+            android:textColor="#3100d4"
             android:gravity="center" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Sets Field -->
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/CustomTextInputLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:textColorHint="#978cbd"
         android:hint="Sets">
 
         <EditText
@@ -53,6 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"
+            android:textColor="#3100d4"
             android:gravity="center" />
     </com.google.android.material.textfield.TextInputLayout>
 

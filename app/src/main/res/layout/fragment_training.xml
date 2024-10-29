@@ -14,25 +14,23 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="2dp">
 
         <EditText
             android:id="@+id/search_edit_text"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/rounded_edittext"
             android:drawableStart="@drawable/ic_search"
-            android:drawablePadding="12dp"
             android:hint="Search trainings..."
             android:inputType="text"
             android:minHeight="48dp"
             android:padding="16dp"
+            android:paddingStart="20dp"
             android:textColor="#3100d4"
             android:textColorHint="#978cbd"
-            android:textSize="16sp"
-            android:layout_marginBottom="16dp"
-            android:paddingStart="20dp"
-            android:contentDescription="Search trainings" />
+            android:textSize="16sp" />
     </RelativeLayout>
 
     <!-- Progress Bar -->
@@ -76,14 +74,14 @@
         style="@style/MyButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Training"
-        android:background="@drawable/button_gradient"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        android:drawableEnd="@drawable/ic_add"
-        android:drawablePadding="8dp"
-        android:contentDescription="Add new training"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:padding="16dp" />
+        android:background="@drawable/button_gradient"
+        android:contentDescription="Add new training"
+        android:drawableEnd="@drawable/ic_add"
+        android:drawablePadding="8dp"
+        android:padding="16dp"
+        android:text="Add New Training"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
 </LinearLayout>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <!-- Training Button -->
+    <Button
+        android:id="@+id/user_training_button"
+        style="@style/MyButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Training Name"
+        android:textSize="14sp"
+        android:background="@drawable/button_gradient_alternate_orange"
+        android:textColor="@android:color/white"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"/>
+
+    <!-- Remove Button -->
+    <ImageButton
+        android:id="@+id/remove_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#fff"
+        android:src="@drawable/ic_delete"
+        android:layout_gravity="end"
+        android:layout_alignParentEnd="true"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp"
+        android:translationY="3dp"
+        android:visibility="gone"
+        android:contentDescription="Delete Trainings"/>
+</LinearLayout>

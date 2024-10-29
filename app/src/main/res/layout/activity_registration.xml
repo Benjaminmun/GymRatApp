@@ -15,14 +15,13 @@
     <!-- TextView for heading -->
 
     <ImageView
-        android:id="@+id/logo"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:id="@+id/gymrat_logo"
+        android:layout_width="134dp"
+        android:layout_height="116dp"
         android:layout_gravity="center"
-        android:layout_marginBottom="24dp"
-        android:contentDescription="App logo"
-        android:src="@drawable/gymrat_logo_background"
-        android:visibility="invisible" />
+        android:layout_marginBottom="15dp"
+        android:contentDescription="Gymrat_Logo"
+        android:translationY="-55dp" />
 
     <TextView
         android:layout_width="wrap_content"
