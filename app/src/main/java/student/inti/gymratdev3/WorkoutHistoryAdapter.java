@@ -48,19 +48,23 @@ public class WorkoutHistoryAdapter extends RecyclerView.Adapter<WorkoutHistoryAd
         holder.dateTextView.setText(date);
         holder.totalTimeTextView.setText("Total Time: " + totalTime);
 
-        // Build the exercises details string
+        // Build the exercises details string, including KG value
         StringBuilder details = new StringBuilder();
         for (Map<String, Object> exercise : exercises) {
             String name = (String) exercise.getOrDefault("exercise", "Unnamed Exercise");
             int reps = ((Number) exercise.getOrDefault("reps", 0)).intValue();
             int sets = ((Number) exercise.getOrDefault("sets", 0)).intValue();
-            details.append(name).append(": ").append(reps)
-                    .append(" reps x ").append(sets).append(" sets\n");
+            int kg = ((Number) exercise.getOrDefault("kg", 0)).intValue();
+
+            details.append(name)
+                    .append(": ").append(reps).append(" reps x ").append(sets).append(" sets ")
+                    .append("@ ").append(kg).append(" kg\n");
         }
 
         // Set the exercises details in the UI
         holder.detailsTextView.setText(details.toString());
     }
+
 
     @Override
     public int getItemCount() {

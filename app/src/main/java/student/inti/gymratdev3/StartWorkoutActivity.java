@@ -146,6 +146,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
         TextView exerciseNameText = exerciseRow.findViewById(R.id.exerciseNameText);
         EditText repsEditText = exerciseRow.findViewById(R.id.repsEditText);
         EditText setsEditText = exerciseRow.findViewById(R.id.setsEditText);
+        EditText kgEditText = exerciseRow.findViewById(R.id.kgEditText);
         CheckBox doneCheckBox = exerciseRow.findViewById(R.id.doneCheckBox);
 
         String name = (String) exercise.get("exercise");
@@ -161,14 +162,17 @@ public class StartWorkoutActivity extends AppCompatActivity {
                 try {
                     int updatedReps = Integer.parseInt(repsEditText.getText().toString());
                     int updatedSets = Integer.parseInt(setsEditText.getText().toString());
+                    float updatedKg = Float.parseFloat(kgEditText.getText().toString());
 
                     Map<String, Object> updatedExercise = new HashMap<>();
                     updatedExercise.put("exercise", name);
                     updatedExercise.put("reps", updatedReps);
                     updatedExercise.put("sets", updatedSets);
+                    updatedExercise.put("kg", updatedKg);  // Add weight (kg)
 
                     repsEditText.setEnabled(false);
                     setsEditText.setEnabled(false);
+                    kgEditText.setEnabled(false);
                     completedExercises.add(updatedExercise);
                 } catch (NumberFormatException e) {
                     Toast.makeText(this, "Please enter valid numbers.", Toast.LENGTH_SHORT).show();
@@ -177,6 +181,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
             } else {
                 repsEditText.setEnabled(true);
                 setsEditText.setEnabled(true);
+                kgEditText.setEnabled(true);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     completedExercises.removeIf(e -> e.get("exercise").equals(name));
                 }
@@ -185,6 +190,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
 
         exercisesContainer.addView(exerciseRow);
     }
+
 
     private void startWorkout() {
         if (!isRunning) {
@@ -222,21 +228,24 @@ public class StartWorkoutActivity extends AppCompatActivity {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         String userId = auth.getCurrentUser().getUid();
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm    ", Locale.getDefault());
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 
         String date = dateFormat.format(new Date());
 
         Map<String, Object> workoutHistory = new HashMap<>();
         workoutHistory.put("date", date);
-        workoutHistory.put("totalTime", totalTime); // Save the total workout time
+        workoutHistory.put("totalTime", totalTime);
         workoutHistory.put("exercises", completedExercises);
 
-        db.collection("users").document(userId).collection("workout_history")
+        db.collection("users")
+                .document(userId)
+                .collection("workout_history")
                 .add(workoutHistory)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "Workout history saved."))
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to save workout history", e));
     }
+
 
 
     private Runnable timerRunnable = new Runnable() {

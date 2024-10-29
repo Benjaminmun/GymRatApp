@@ -3,9 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:layout_marginBottom="8dp"
     android:gravity="center_vertical"
-    android:padding="8dp"
-    android:layout_marginBottom="8dp">
+    android:padding="8dp">
 
     <!-- Exercise Name -->
     <TextView
@@ -13,10 +13,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
-        android:text="Exercise Name"
+        android:text="Exercise"
         android:textSize="18sp"
-        android:textColor="@android:color/black"
-        android:fontFamily="sans-serif" />
+        android:textColor="@android:color/black" />
 
     <!-- Reps Input -->
     <EditText
@@ -24,11 +23,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:inputType="number"
         android:hint="Reps"
-        android:padding="8dp"
-        android:background="@android:drawable/edit_text"
-        android:gravity="center" />
+        android:inputType="number" />
 
     <!-- Sets Input -->
     <EditText
@@ -36,16 +32,21 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:inputType="number"
         android:hint="Sets"
-        android:padding="8dp"
-        android:background="@android:drawable/edit_text"
-        android:gravity="center" />
+        android:inputType="number" />
 
-    <!-- Done Checkbox -->
+    <!-- Kg Input -->
+    <EditText
+        android:id="@+id/kgEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="Kg"
+        android:inputType="numberDecimal" />
+
+    <!-- Checkbox for Completion -->
     <CheckBox
         android:id="@+id/doneCheckBox"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp" />
+        android:layout_height="wrap_content" />
 </LinearLayout>
