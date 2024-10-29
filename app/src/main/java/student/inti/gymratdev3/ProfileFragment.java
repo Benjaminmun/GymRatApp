@@ -137,7 +137,11 @@ public class ProfileFragment extends Fragment {
     private void loadProfileImage() {
         StorageReference storageReference = firebaseStorage.getReference("profile_pictures/" + firebaseAuth.getCurrentUser().getUid() + ".jpg");
         storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
-            Glide.with(getActivity()).load(uri).into(profileImageView);
+            // Load image with Glide and apply circle crop
+            Glide.with(getActivity())
+                    .load(uri)
+                    .circleCrop() // Apply circle crop transformation
+                    .into(profileImageView);
         }).addOnFailureListener(e -> {
             profileImageView.setImageResource(R.drawable.ic_profile_placeholder);
             Toast.makeText(getActivity(), "Failed to load image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
