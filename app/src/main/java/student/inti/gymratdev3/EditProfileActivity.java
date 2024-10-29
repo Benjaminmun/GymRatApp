@@ -71,6 +71,12 @@ public class EditProfileActivity extends AppCompatActivity {
         storageReference = FirebaseStorage.getInstance().getReference("profile_pictures");
         db = FirebaseFirestore.getInstance();
 
+        // Change status bar color to match button color
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(android.graphics.Color.parseColor("#3100d4"));
+        }
+
         // Set up UI components
         setupUI();
 
@@ -162,18 +168,11 @@ public class EditProfileActivity extends AppCompatActivity {
             imageUri = data.getData();
             Log.d("Image URI", "Selected URI: " + (imageUri != null ? imageUri.toString() : "null"));
             if (imageUri != null) {
-                // Try loading image with Glide
+                // Load image with Glide and apply circle crop
                 Glide.with(this)
                         .load(imageUri)
+                        .circleCrop() // Apply circle crop transformation
                         .into(profileImageView);
-
-                // Alternatively, load with BitmapFactory if Glide fails
-                try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                    profileImageView.setImageBitmap(bitmap);
-                } catch (IOException e) {
-                    Toast.makeText(this, "Failed to load image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
             } else {
                 Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
             }
@@ -198,7 +197,11 @@ public class EditProfileActivity extends AppCompatActivity {
 
                         String profilePictureUrl = documentSnapshot.getString("profilePictureUrl");
                         if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
-                            Glide.with(this).load(profilePictureUrl).into(profileImageView);
+                            // Load profile picture with Glide and apply circle crop
+                            Glide.with(this)
+                                    .load(profilePictureUrl)
+                                    .circleCrop() // Apply circle crop transformation
+                                    .into(profileImageView);
                         }
                     } else {
                         Toast.makeText(this, "Failed to load profile data.", Toast.LENGTH_SHORT).show();
@@ -271,7 +274,7 @@ public class EditProfileActivity extends AppCompatActivity {
         saveChangesButton.setEnabled(true);
         uploadPictureButton.setEnabled(true);
 
-        if (imageUrl != null) Glide.with(this).load(imageUrl).into(profileImageView);
+        if (imageUrl != null) Glide.with(this).load(imageUrl).circleCrop().into(profileImageView);
         Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
     }
 

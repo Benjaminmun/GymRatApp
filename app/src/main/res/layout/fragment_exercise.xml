@@ -39,12 +39,13 @@
             android:id="@+id/filter_icon_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:background="#fff"
             android:src="@drawable/ic_filter"
             android:layout_gravity="end"
             android:layout_alignParentEnd="true"
             android:padding="16dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Filter Exercises"/>
     </RelativeLayout>
 
     <!-- Horizontal Scrollable Filter Buttons -->
@@ -191,7 +192,9 @@
             android:id="@+id/workout_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            android:contentDescription="Exercise Scrollview"/>
+
     </ScrollView>
 
     <!-- Add Exercise Button -->
