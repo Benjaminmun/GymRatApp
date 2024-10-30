@@ -11,9 +11,9 @@
         android:id="@+id/dialogTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Workout Paused"
+        android:text="Training Paused"
         android:textSize="22sp"
-        android:textColor="@android:color/black"
+        android:textColor="#3100d4"
         android:fontFamily="sans-serif-medium"
         android:layout_marginBottom="16dp" />
 
@@ -21,34 +21,37 @@
         android:id="@+id/dialogMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Do you want to resume, restart, or cancel the workout?"
+        android:text="Do you want to resume, restart, or cancel the training?"
         android:textSize="16sp"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="#3100d4"
         android:layout_marginBottom="24dp" />
 
     <Button
         android:id="@+id/btnResume"
+        style="@style/MyButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Resume"
         android:textColor="@android:color/white"
-        android:backgroundTint="@android:color/holo_green_dark"
+        android:background="@drawable/button_gradient_alternate_green"
         android:layout_marginBottom="8dp" />
 
     <Button
         android:id="@+id/btnRestart"
+        style="@style/MyButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Restart"
         android:textColor="@android:color/white"
-        android:backgroundTint="@android:color/holo_orange_dark"
+        android:background="@drawable/button_gradient_alternate_orange"
         android:layout_marginBottom="8dp" />
 
     <Button
         android:id="@+id/btnCancel"
+        style="@style/MyButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cancel Workout"
+        android:text="Cancel Training"
         android:textColor="@android:color/white"
-        android:backgroundTint="@android:color/holo_red_dark" />
+        android:background="@drawable/button_red_gradient" />
 </LinearLayout>

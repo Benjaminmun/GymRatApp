@@ -39,12 +39,13 @@
             android:id="@+id/filter_icon_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:background="#fff"
             android:src="@drawable/ic_filter"
             android:layout_gravity="end"
             android:layout_alignParentEnd="true"
             android:padding="16dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Filter Exercises"/>
     </RelativeLayout>
 
     <!-- Horizontal Scrollable Filter Buttons -->
@@ -63,6 +64,17 @@
             android:background="@drawable/rounded_edittext"
             android:padding="5dp"
             android:gravity="center">
+
+            <!-- All Button -->
+            <Button
+                android:id="@+id/filter_all_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="All"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
 
             <!-- Arms Button -->
             <Button
@@ -94,17 +106,6 @@
                 android:layout_height="wrap_content"
                 android:text="Olympic"
                 android:textSize="10dp"
-                android:textColor="#fff"
-                android:background="@drawable/button_gradient"
-                android:layout_marginEnd="8dp" />
-
-            <!-- All Button -->
-            <Button
-                android:id="@+id/filter_all_button"
-                style="@style/MyButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="All"
                 android:textColor="#fff"
                 android:background="@drawable/button_gradient"
                 android:layout_marginEnd="8dp" />
@@ -157,7 +158,8 @@
                 android:layout_height="wrap_content"
                 android:text="Legs"
                 android:textColor="#fff"
-                android:background="@drawable/button_gradient" />
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
 
             <Button
                 android:id="@+id/fullbody_category_button"
@@ -191,7 +193,9 @@
             android:id="@+id/workout_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            android:contentDescription="Exercise Scrollview"/>
+
     </ScrollView>
 
     <!-- Add Exercise Button -->
@@ -200,7 +204,7 @@
         style="@style/MyButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Exercise"
+        android:text="Add New Exercise"
         android:layout_gravity="center"
         android:background="@drawable/button_gradient"
         android:textColor="@android:color/white"

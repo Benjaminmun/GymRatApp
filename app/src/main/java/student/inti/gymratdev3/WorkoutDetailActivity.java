@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -128,15 +129,19 @@ public class WorkoutDetailActivity extends AppCompatActivity {
     private void setupDeleteButton() {
         deleteButton.setOnClickListener(v -> {
             if (isCustomExercise) {
-                new androidx.appcompat.app.AlertDialog.Builder(this)
-                        .setTitle("Delete Exercise")
+                // Create a MaterialAlertDialogBuilder
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+
+                // Set title and message for the dialog
+                builder.setTitle("Delete Exercise")
                         .setMessage("Are you sure you want to delete this exercise?")
                         .setPositiveButton("Yes", (dialog, which) -> deleteCustomExercise())
-                        .setNegativeButton("No", null)
-                        .show();
+                        .setNegativeButton("No", (dialog, which) -> dialog.dismiss()) // Dismiss dialog on "No"
+                        .show(); // Show the dialog
             }
         });
     }
+
 
     private void deleteCustomExercise() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();

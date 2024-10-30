@@ -39,6 +39,12 @@ public class EditUserTrainingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_user_training);
 
+        // Change status bar color to match button color
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(android.graphics.Color.parseColor("#3100d4"));
+        }
+
         // Initialize UI elements
         trainingNameEditText = findViewById(R.id.training_name_edit_text);
         exercisesContainer = findViewById(R.id.exercises_container);

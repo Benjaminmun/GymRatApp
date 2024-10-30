@@ -15,25 +15,45 @@
         android:layout_weight="2"
         android:text="Exercise"
         android:textSize="18sp"
-        android:textColor="@android:color/black" />
+        android:textColor="#3100d4"
+        android:textStyle="bold"
+
+        />
 
     <!-- Reps Input -->
+
+    <!-- Sets Input -->
     <EditText
         android:id="@+id/repsEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="3dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_weight="1"
+        android:background="@drawable/edit_text_border"
         android:hint="Reps"
-        android:inputType="number" />
+        android:inputType="number"
+        android:padding="10dp"
+        android:textColor="#3100d4"
+        android:textColorHint="#978cbd"
+        android:textSize="16sp" />
 
-    <!-- Sets Input -->
     <EditText
         android:id="@+id/setsEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:hint="Sets"
-        android:inputType="number" />
+        android:background="@drawable/edit_text_border"
+        android:inputType="number"
+        android:textSize="16sp"
+        android:textColor="#3100d4"
+        android:textColorHint="#978cbd"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginHorizontal="3dp"
+        android:padding="10dp"/>
 
     <!-- Kg Input -->
     <EditText
@@ -42,7 +62,15 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:hint="Kg"
-        android:inputType="numberDecimal" />
+        android:background="@drawable/edit_text_border"
+        android:inputType="numberDecimal"
+        android:textSize="16sp"
+        android:textColor="#3100d4"
+        android:textColorHint="#978cbd"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginHorizontal="3dp"
+        android:padding="10dp"/>
 
     <!-- Checkbox for Completion -->
     <CheckBox

@@ -1,6 +1,6 @@
 package student.inti.gymratdev3;
 
-import android.content.DialogInterface;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,10 +31,19 @@ public class StartWorkoutActivity extends AppCompatActivity {
     private List<Map<String, Object>> completedExercises = new ArrayList<>();
     private static final String TAG = "StartWorkoutActivity";
 
+    private final int[] countdown = {3}; // Countdown start value
+    private Handler countdownHandler = new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_workout);
+
+        // Change status bar color to match button color
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(android.graphics.Color.parseColor("#3100d4"));
+        }
 
         // Initialize views
         timerTextView = findViewById(R.id.timerTextView);
@@ -58,8 +67,8 @@ public class StartWorkoutActivity extends AppCompatActivity {
 
         // Button listeners
         pauseButton.setOnClickListener(v -> {
-            pauseWorkout();  // Pause the workout if it's running
-            showPauseDialog(); // Display the workout options dialog
+            pauseWorkout();
+            showPauseDialog();
         });
         finishButton.setOnClickListener(v -> finishWorkout());
 
@@ -67,62 +76,165 @@ public class StartWorkoutActivity extends AppCompatActivity {
         startCountdown();
     }
 
-    private void startCountdown() {
-        // Show only the countdown and hide other views
-        countdownTextView.setVisibility(View.VISIBLE);
-        timerTextView.setVisibility(View.GONE);
-        exercisesContainer.setVisibility(View.GONE);
-        trainingNameTextView.setVisibility(View.GONE); // Hide the training name
+    @Override
+    public void onBackPressed() {
+        // Pause the countdown timer
+        countdownHandler.removeCallbacksAndMessages(null);
 
-        // Hide pause and finish buttons during the countdown
-        pauseButton.setVisibility(View.GONE);
-        finishButton.setVisibility(View.GONE);
+        new AlertDialog.Builder(this)
+                .setTitle("Cancel Workout")
+                .setMessage("Are you sure you want to cancel the workout? Your progress will not be saved.")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    super.onBackPressed(); // Cancel the workout and return to the previous screen
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // Resume the countdown if user cancels the dialog
+                    resumeCountdown();
+                })
+                .show();
+    }
 
-        // Ensure the countdown is centered
-        countdownTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        countdownTextView.setGravity(Gravity.CENTER);
-
-        final int[] countdown = {3}; // Adjust starting value as needed
-        Handler countdownHandler = new Handler();
+    private void resumeCountdown() {
+        // Restart the countdown from where it left off
         countdownHandler.post(new Runnable() {
             @Override
             public void run() {
                 if (countdown[0] > 0) {
+                    playTickSound();  // Play tick sound
+
+                    countdownTextView.startAnimation(
+                            android.view.animation.AnimationUtils.loadAnimation(
+                                    StartWorkoutActivity.this, R.anim.scale_animation));
+
                     countdownTextView.setText(String.valueOf(countdown[0]--));
-                    countdownHandler.postDelayed(this, 1000);
+                    countdownHandler.postDelayed(this, 1000); // 1-second delay
                 } else {
                     // Switch views after countdown finishes
                     countdownTextView.setVisibility(View.GONE);
                     timerTextView.setVisibility(View.VISIBLE);
                     exercisesContainer.setVisibility(View.VISIBLE);
-                    trainingNameTextView.setVisibility(View.VISIBLE); // Show training name
+                    trainingNameTextView.setVisibility(View.VISIBLE);
 
-                    // Show pause and finish buttons once the workout starts
                     pauseButton.setVisibility(View.VISIBLE);
                     finishButton.setVisibility(View.VISIBLE);
 
-                    startWorkout(); // Automatically start the workout after countdown
+                    startWorkout(); // Start workout automatically
                 }
             }
         });
     }
 
 
+
+    private void startCountdown() {
+        countdownTextView.setVisibility(View.VISIBLE);
+        timerTextView.setVisibility(View.GONE);
+        exercisesContainer.setVisibility(View.GONE);
+        trainingNameTextView.setVisibility(View.GONE);
+        pauseButton.setVisibility(View.GONE);
+        finishButton.setVisibility(View.GONE);
+
+        countdownTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        countdownTextView.setGravity(Gravity.CENTER);
+
+        countdownHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (countdown[0] > 0) {
+                    playTickSound();  // Play tick sound
+
+                    countdownTextView.startAnimation(
+                            android.view.animation.AnimationUtils.loadAnimation(
+                                    StartWorkoutActivity.this, R.anim.scale_animation));
+
+                    countdownTextView.setText(String.valueOf(countdown[0]--));
+                    countdownHandler.postDelayed(this, 1000); // 1-second delay
+                } else {
+                    // Switch views after countdown finishes
+                    countdownTextView.setVisibility(View.GONE);
+                    timerTextView.setVisibility(View.VISIBLE);
+                    exercisesContainer.setVisibility(View.VISIBLE);
+                    trainingNameTextView.setVisibility(View.VISIBLE);
+
+                    pauseButton.setVisibility(View.VISIBLE);
+                    finishButton.setVisibility(View.VISIBLE);
+
+                    startWorkout(); // Start workout automatically
+                }
+            }
+        });
+    }
+
+    private void playTickSound() {
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.tick);
+        mediaPlayer.start();
+        mediaPlayer.setOnCompletionListener(MediaPlayer::release);
+    }
+
+    private void startWorkout() {
+        if (!isRunning) {
+            startTime = System.currentTimeMillis();
+            handler.post(timerRunnable);
+            isRunning = true;
+            Toast.makeText(this, "Workout started!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void pauseWorkout() {
+        if (isRunning) {
+            pauseOffset += System.currentTimeMillis() - startTime;
+            handler.removeCallbacks(timerRunnable);
+            isRunning = false;
+            Toast.makeText(this, "Workout paused!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void finishWorkout() {
+        // Check if at least one exercise has been completed
+        if (completedExercises.isEmpty()) {
+            Toast.makeText(this, "Please complete at least one exercise to finish the workout.", Toast.LENGTH_SHORT).show();
+            return; // Prevent finishing the workout
+        }
+
+        if (isRunning) pauseWorkout();
+        // If exercises are completed, proceed with finishing
+        String totalTime = timerTextView.getText().toString();
+        saveWorkoutHistory(totalTime);
+        Toast.makeText(this, "Workout finished and saved!", Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
+
+    private void saveWorkoutHistory(String totalTime) {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String userId = auth.getCurrentUser().getUid();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        String date = dateFormat.format(new Date());
+
+        Map<String, Object> workoutHistory = new HashMap<>();
+        workoutHistory.put("date", date);
+        workoutHistory.put("totalTime", totalTime);
+        workoutHistory.put("exercises", completedExercises);
+
+        db.collection("users")
+                .document(userId)
+                .collection("workout_history")
+                .add(workoutHistory)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Workout history saved."))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to save workout history", e));
+    }
+
     private void loadExercises() {
         trainingRef.get().addOnSuccessListener(snapshot -> {
             if (snapshot.exists()) {
-                // Display the training name using the correct key from Firestore
-                String trainingName = snapshot.getString("trainingName"); // Updated key to match your data structure
-                if (trainingName != null) {
-                    trainingNameTextView.setText(trainingName);
-                } else {
-                    trainingNameTextView.setText("Unnamed Training");
-                }
+                String trainingName = snapshot.getString("trainingName");
+                trainingNameTextView.setText(trainingName != null ? trainingName : "Unnamed Training");
 
-                // Load exercises from the snapshot
                 exercises = (List<Map<String, Object>>) snapshot.get("exercises");
                 if (exercises != null && !exercises.isEmpty()) {
-                    displayExercises(); // Call a method to display the exercises in the UI
+                    displayExercises();
                 } else {
                     Toast.makeText(this, "No exercises found.", Toast.LENGTH_SHORT).show();
                 }
@@ -132,11 +244,9 @@ public class StartWorkoutActivity extends AppCompatActivity {
         }).addOnFailureListener(e -> Log.e(TAG, "Failed to load exercises", e));
     }
 
-
     private void displayExercises() {
         for (int i = 0; i < exercises.size(); i++) {
-            Map<String, Object> exercise = exercises.get(i);
-            addExerciseRow(exercise, i);
+            addExerciseRow(exercises.get(i), i);
         }
     }
 
@@ -168,7 +278,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
                     updatedExercise.put("exercise", name);
                     updatedExercise.put("reps", updatedReps);
                     updatedExercise.put("sets", updatedSets);
-                    updatedExercise.put("kg", updatedKg);  // Add weight (kg)
+                    updatedExercise.put("kg", updatedKg);
 
                     repsEditText.setEnabled(false);
                     setsEditText.setEnabled(false);
@@ -190,63 +300,6 @@ public class StartWorkoutActivity extends AppCompatActivity {
 
         exercisesContainer.addView(exerciseRow);
     }
-
-
-    private void startWorkout() {
-        if (!isRunning) {
-            startTime = System.currentTimeMillis();
-            handler.post(timerRunnable);
-            isRunning = true;
-            Toast.makeText(this, "Workout started!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void pauseWorkout() {
-        if (isRunning) {
-            pauseOffset += System.currentTimeMillis() - startTime;
-            handler.removeCallbacks(timerRunnable);
-            isRunning = false;
-            Toast.makeText(this, "Workout paused!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void finishWorkout() {
-        if (isRunning) pauseWorkout();
-
-        if (completedExercises.size() > 0) {
-            String totalTime = timerTextView.getText().toString(); // Capture the final time
-            saveWorkoutHistory(totalTime); // Pass the total time to be saved
-            Toast.makeText(this, "Workout finished and saved!", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "No exercises completed. Nothing saved.", Toast.LENGTH_SHORT).show();
-        }
-        finish();
-    }
-
-
-    private void saveWorkoutHistory(String totalTime) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        String userId = auth.getCurrentUser().getUid();
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm    ", Locale.getDefault());
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8"));
-
-        String date = dateFormat.format(new Date());
-
-        Map<String, Object> workoutHistory = new HashMap<>();
-        workoutHistory.put("date", date);
-        workoutHistory.put("totalTime", totalTime);
-        workoutHistory.put("exercises", completedExercises);
-
-        db.collection("users")
-                .document(userId)
-                .collection("workout_history")
-                .add(workoutHistory)
-                .addOnSuccessListener(aVoid -> Log.d(TAG, "Workout history saved."))
-                .addOnFailureListener(e -> Log.e(TAG, "Failed to save workout history", e));
-    }
-
-
 
     private Runnable timerRunnable = new Runnable() {
         @Override

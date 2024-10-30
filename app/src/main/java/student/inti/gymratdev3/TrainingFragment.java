@@ -10,12 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -63,6 +65,7 @@ public class TrainingFragment extends Fragment {
         return rootView;
     }
 
+
     private void initializeViews(View rootView) {
         trainingContainer = rootView.findViewById(R.id.training_container);
         addTrainingButton = rootView.findViewById(R.id.add_training_button);
@@ -92,9 +95,10 @@ public class TrainingFragment extends Fragment {
 
     private void addDefaultTrainings() {
         for (String training : defaultTrainings) {
-            addTrainingButtonToContainer(training, null, false);
+            addDefaultTrainingButtonToContainer(training);
         }
     }
+
 
     private void loadUserTrainings() {
         if (currentUser == null) {
@@ -110,15 +114,8 @@ public class TrainingFragment extends Fragment {
                         return;
                     }
 
-                    // Clear user-specific trainings only (keep default ones)
-                    for (View trainingView : allTrainingViews) {
-                        Button trainingButton = trainingView.findViewById(R.id.training_button);
-                        String trainingName = trainingButton.getText().toString();
-                        if (!defaultTrainings.contains(trainingName)) {
-                            trainingContainer.removeView(trainingView);
-                        }
-                    }
-                    allTrainingViews.clear(); // Clear all stored views
+                    // Remove existing user training views
+                    removeUserTrainingViews();
 
                     // Add each training from Firestore with the document ID
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
@@ -126,35 +123,64 @@ public class TrainingFragment extends Fragment {
                         String trainingId = document.getId(); // Get the unique document ID
 
                         if (trainingName != null) {
-                            addTrainingButtonToContainer(trainingName, trainingId, true); // Add with document ID
+                            addUserTrainingButtonToContainer(trainingName, trainingId); // Add with document ID
                         }
                     }
                 });
     }
 
-    private void addTrainingButtonToContainer(String trainingName, String trainingId, boolean isRemovable) {
-        View trainingView = LayoutInflater.from(getContext()).inflate(R.layout.training_button_layout, null);
+    private void removeUserTrainingViews() {
+        List<View> viewsToRemove = new ArrayList<>();
+        for (View trainingView : allTrainingViews) {
+            Button trainingButton = trainingView.findViewById(R.id.user_training_button);
+            if (trainingButton != null) {
+                trainingContainer.removeView(trainingView);
+                viewsToRemove.add(trainingView);
+            }
+        }
+        allTrainingViews.removeAll(viewsToRemove);
+    }
+
+
+    private void addDefaultTrainingButtonToContainer(String trainingName) {
+        View trainingView = LayoutInflater.from(getContext()).inflate(R.layout.default_training_button_layout, null);
         Button trainingButton = trainingView.findViewById(R.id.training_button);
-        Button removeButton = trainingView.findViewById(R.id.remove_button);
+        ImageButton removeButton = trainingView.findViewById(R.id.remove_button);
 
         trainingButton.setText(trainingName);
         trainingButton.setBackgroundResource(R.drawable.button_gradient_alternate);
         trainingButton.setTextColor(getResources().getColor(android.R.color.white));
         trainingButton.setPadding(16, 16, 16, 16);
 
-        // Navigate to the detail activity with the trainingId
-        trainingButton.setOnClickListener(v -> navigateToTrainingDetail(trainingId));
+        // Navigate to the detail activity without trainingId
+        trainingButton.setOnClickListener(v -> navigateToTrainingDetail(null));
 
-        if (isRemovable) {
-            removeButton.setVisibility(View.VISIBLE);
-            removeButton.setOnClickListener(v -> removeTrainingPlan(trainingId, trainingView));
-        } else {
-            removeButton.setVisibility(View.GONE);
-        }
+        removeButton.setVisibility(View.GONE);
 
         trainingContainer.addView(trainingView);
         allTrainingViews.add(trainingView);
     }
+
+    private void addUserTrainingButtonToContainer(String trainingName, String trainingId) {
+        View trainingView = LayoutInflater.from(getContext()).inflate(R.layout.user_training_button_layout, null);
+        Button trainingButton = trainingView.findViewById(R.id.user_training_button);
+        ImageButton removeButton = trainingView.findViewById(R.id.remove_button);
+
+        trainingButton.setText(trainingName);
+        trainingButton.setBackgroundResource(R.drawable.button_gradient_alternate_orange);
+        trainingButton.setTextColor(getResources().getColor(android.R.color.white));
+        trainingButton.setPadding(16, 16, 16, 16);
+
+        // Navigate to the detail activity with the trainingId
+        trainingButton.setOnClickListener(v -> navigateToTrainingDetail(trainingId));
+
+        removeButton.setVisibility(View.VISIBLE);
+        removeButton.setOnClickListener(v -> removeTrainingPlan(trainingId, trainingView));
+
+        trainingContainer.addView(trainingView);
+        allTrainingViews.add(trainingView);
+    }
+
 
     private void navigateToTrainingDetail(String trainingId) {
         Intent intent = new Intent(getContext(), TrainingDetailActivity.class);
@@ -163,25 +189,41 @@ public class TrainingFragment extends Fragment {
     }
 
     private void removeTrainingPlan(String trainingId, View trainingView) {
-        // Delete the training by its document ID
-        db.collection("trainings").document(trainingId)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    showSnackbar("Training removed");
-                    trainingContainer.removeView(trainingView);
-                    allTrainingViews.remove(trainingView);
+        // Create a MaterialAlertDialogBuilder
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+
+        // Set title and message for the dialog
+        builder.setTitle("Confirm Deletion")
+                .setMessage("Are you sure you want to remove this training?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // Delete the training by its document ID
+                    db.collection("trainings").document(trainingId)
+                            .delete()
+                            .addOnSuccessListener(aVoid -> {
+                                showSnackbar("Training removed");
+                                trainingContainer.removeView(trainingView);
+                                allTrainingViews.remove(trainingView);
+                            })
+                            .addOnFailureListener(e -> showSnackbar("Failed to remove training"));
                 })
-                .addOnFailureListener(e -> showSnackbar("Failed to remove training"));
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                .show(); // Show the dialog
     }
+
+
 
     private void filterTrainings(String query) {
         query = query.toLowerCase();
         for (View trainingView : allTrainingViews) {
             Button trainingButton = trainingView.findViewById(R.id.training_button);
+            if (trainingButton == null) {
+                trainingButton = trainingView.findViewById(R.id.user_training_button);
+            }
             String trainingName = trainingButton.getText().toString().toLowerCase();
             trainingView.setVisibility(trainingName.contains(query) ? View.VISIBLE : View.GONE);
         }
     }
+
 
     private void showSnackbar(String message) {
         Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show();

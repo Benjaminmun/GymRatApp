@@ -42,10 +42,18 @@ public class TrainingDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_training_detail);
 
+        // Change status bar color
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(android.graphics.Color.parseColor("#3100d4"));
+        }
+
         initializeUI();
         setupFirestore();
         loadAvailableExercises();
         loadExercises();
+
+        updateRemoveButtonState();
 
         // Set listeners
         addExerciseButton.setOnClickListener(v -> {
@@ -68,6 +76,7 @@ public class TrainingDetailActivity extends AppCompatActivity {
             }
         });
     }
+
 
 
 
@@ -118,7 +127,9 @@ public class TrainingDetailActivity extends AppCompatActivity {
             int sets = ((Number) exercise.get("sets")).intValue();
             addExerciseView(name, reps, sets);
         }
+        updateRemoveButtonState();
     }
+
 
     private void addExerciseView(String name, int reps, int sets) {
         View exerciseView = LayoutInflater.from(this)
@@ -138,6 +149,7 @@ public class TrainingDetailActivity extends AppCompatActivity {
 
         exercisesLayout.addView(exerciseView);
         exerciseViews.add(exerciseView);
+        updateRemoveButtonState();
     }
 
     private void addExerciseField() {
@@ -156,6 +168,7 @@ public class TrainingDetailActivity extends AppCompatActivity {
 
         exercisesLayout.addView(exerciseLayout);
         exerciseViews.add(exerciseLayout);
+        updateRemoveButtonState();
 
         isDataChanged = true; // Mark data as changed when user adds an exercise
         scheduleSave();
@@ -164,13 +177,14 @@ public class TrainingDetailActivity extends AppCompatActivity {
 
 
     private void removeLastExercise() {
-        if (!exerciseViews.isEmpty()) {
+        if (exerciseViews.size() > 1) {
             View lastExercise = exerciseViews.remove(exerciseViews.size() - 1);
             exercisesLayout.removeView(lastExercise);
             isDataChanged = true; // Mark data as changed when user removes an exercise
             scheduleSave();
+            updateRemoveButtonState(); // Add this line
         } else {
-            showError("No exercises to remove.");
+            showError("Cannot remove the last exercise.");
         }
     }
 
@@ -296,4 +310,13 @@ public class TrainingDetailActivity extends AppCompatActivity {
         saveRunnable = () -> saveExercises(null);
         saveHandler.postDelayed(saveRunnable, 2000); // Save after 2 seconds
     }
+
+    private void updateRemoveButtonState() {
+        if (exerciseViews.size() <= 1) {
+            removeExerciseButton.setEnabled(false);
+        } else {
+            removeExerciseButton.setEnabled(true);
+        }
+    }
+
 }

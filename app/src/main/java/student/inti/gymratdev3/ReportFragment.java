@@ -91,7 +91,7 @@ public class ReportFragment extends Fragment {
                         }
 
                         // Update Stats Views
-                        totalMinutesTextView.setText(String.format("Total Workout Time: %d mins", totalMinutes));
+                        totalMinutesTextView.setText(String.format("Total Training Time: %d mins", totalMinutes));
                         totalExercisesTextView.setText(String.format("Total Exercises: %d", totalExercises));
 
                         adapter.notifyDataSetChanged(); // Refresh the RecyclerView
