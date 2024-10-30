@@ -1,0 +1,14 @@
+<!-- res/drawable/button_gradient_green.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:startColor="#00e676"
+        android:endColor="#00c853">
+
+    </gradient>
+    <corners android:radius="10dp" />
+    <padding
+        android:left="12dp"
+        android:top="12dp"
+        android:right="12dp"
+        android:bottom="12dp" />
+</shape>
