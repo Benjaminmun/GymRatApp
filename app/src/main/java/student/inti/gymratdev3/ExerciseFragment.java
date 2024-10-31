@@ -394,30 +394,39 @@ public class ExerciseFragment extends Fragment {
 
 
     private void fetchAndAddUserWorkoutsToCategory(String category) {
-        Log.d("Firestore", "Fetching user workouts for category: " + category); // Add log here
+        Log.d("Firestore", "Fetching user workouts for category: " + category);
         db.collection("users").document(userId).collection("custom_exercises")
                 .whereEqualTo("category", category).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Log.d("Firestore", "Query returned: " + task.getResult().size() + " documents"); // Log result size
+                        if (!isAdded()) {
+                            Log.w("ExerciseFragment", "Fragment not attached to activity. Skipping UI update.");
+                            return;
+                        }
+                        Log.d("Firestore", "Query returned: " + task.getResult().size() + " documents");
                         if (!task.getResult().isEmpty()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d("Firestore", "Adding user workout: " + document.getString("exercise_name")); // Log each document
                                 addUserWorkoutButton(document.getString("exercise_name"),
-                                        new String[]{document.getString("execution"),
+                                        new String[]{
+                                                document.getString("execution"),
                                                 document.getString("focus_area"),
                                                 document.getString("equipment"),
-                                                document.getString("preparation")});
+                                                document.getString("preparation")
+                                        }
+                                );
                             }
                         } else {
                             Log.d("Firestore", "No user workouts found for category: " + category);
                         }
                     } else {
                         Log.e("Firestore", "Error fetching user exercises: ", task.getException());
-                        Toast.makeText(getActivity(), "Failed to load user exercises.", Toast.LENGTH_SHORT).show();
+                        if (isAdded()) {
+                            Toast.makeText(getActivity(), "Failed to load user exercises.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }
+
 
 
 
@@ -439,29 +448,48 @@ public class ExerciseFragment extends Fragment {
     }
 
     private void fetchAndAddUserWorkoutsToCategoryAll(String category) {
+        Log.d("Firestore", "Fetching user workouts for category: " + category);
         db.collection("users").document(userId).collection("custom_exercises")
                 .whereEqualTo("category", category).get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        Log.d("Firestore", "Query returned: " + task.getResult().size() + " documents"); // Log result size
-
-                        // Add a label for user workouts if any are found
-                        TextView userCategoryLabel = addCategoryLabel("USER " + category.toUpperCase() + " WORKOUTS");
-                        userCategoryLabel.setTextColor(Color.parseColor("#FF4500"));
-                        userCategoryLabel.setTypeface(null, Typeface.BOLD);
-                        userCategoryLabel.setGravity(Gravity.CENTER);
-
-                        // Add each user workout to the UI
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            addUserWorkoutButton(document.getString("exercise_name"),
-                                    new String[]{document.getString("execution"),
-                                            document.getString("focus_area"),
-                                            document.getString("equipment"),
-                                            document.getString("preparation")});
+                    if (task.isSuccessful()) {
+                        if (!isAdded()) {
+                            Log.w("ExerciseFragment", "Fragment not attached to activity. Skipping UI update.");
+                            return;
                         }
-                    } else if (task.getException() != null) {
+                        Log.d("Firestore", "Query returned: " + task.getResult().size() + " documents");
+
+                        if (!task.getResult().isEmpty()) {
+                            TextView userCategoryLabel = addCategoryLabel("USER " + category.toUpperCase() + " WORKOUTS");
+
+                            // Check if the label was successfully created
+                            if (userCategoryLabel != null) {
+                                userCategoryLabel.setTextColor(Color.parseColor("#FF4500"));
+                                userCategoryLabel.setTypeface(null, Typeface.BOLD);
+                                userCategoryLabel.setGravity(Gravity.CENTER);
+                            } else {
+                                Log.w("ExerciseFragment", "Failed to add category label. Skipping UI updates for this category.");
+                                return;
+                            }
+
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                addUserWorkoutButton(document.getString("exercise_name"),
+                                        new String[]{
+                                                document.getString("execution"),
+                                                document.getString("focus_area"),
+                                                document.getString("equipment"),
+                                                document.getString("preparation")
+                                        }
+                                );
+                            }
+                        } else {
+                            Log.d("Firestore", "No user workouts found for category: " + category);
+                        }
+                    } else {
                         Log.e("Firestore", "Error fetching user exercises: ", task.getException());
-                        Toast.makeText(getActivity(), "Failed to load user exercises.", Toast.LENGTH_SHORT).show();
+                        if (isAdded()) {
+                            Toast.makeText(getActivity(), "Failed to load user exercises.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }
@@ -482,14 +510,20 @@ public class ExerciseFragment extends Fragment {
 
 
     private TextView addCategoryLabel(String text) {
+        if (!isAdded()) {
+            Log.w("ExerciseFragment", "Fragment not attached to activity. Cannot add category label.");
+            return null;
+        }
+
         // Add a label to separate workout categories
-        TextView label = new TextView(getActivity());
+        TextView label = new TextView(getContext());
         label.setText(text);
         label.setTextSize(18);
         label.setPadding(0, 10, 0, 10);
         workoutContainer.addView(label);
         return label;
     }
+
 
     private void addWorkoutButton(String name, Workout workout) {
         addWorkoutButton(name, new String[]{workout.getExecution(), workout.getFocusArea(), workout.getEquipment(), workout.getPreparation()});
@@ -618,16 +652,16 @@ public class ExerciseFragment extends Fragment {
 
 
     private void fetchAndFilterUserWorkouts(String query) {
-        // Fetch user workouts filtered by the search query from Firestore
         db.collection("users").document(userId).collection("custom_exercises")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        Log.d("Firestore", "Query returned: " + task.getResult().size() + " documents"); // Log result size
+                        if (!isAdded()) {
+                            Log.w("ExerciseFragment", "Fragment not attached to activity. Skipping UI update.");
+                            return;
+                        }
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String exerciseName = document.getString("exercise_name");
-
-                            // Check if the exercise name contains the search query
                             if (exerciseName != null && exerciseName.toLowerCase().contains(query.toLowerCase())) {
                                 String[] details = {
                                         document.getString("execution"),
@@ -635,17 +669,22 @@ public class ExerciseFragment extends Fragment {
                                         document.getString("equipment"),
                                         document.getString("preparation")
                                 };
-
-                                // Add the user workout button without category labels
                                 addUserWorkoutButton(exerciseName, details);
                             }
                         }
-                    } else if (task.getException() != null) {
-                        Log.e("Firestore", "Failed to fetch user exercises", task.getException());
-                        Toast.makeText(getActivity(), "Error loading exercises.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        if (!isAdded()) {
+                            Log.w("ExerciseFragment", "Fragment not attached to activity. Skipping toast.");
+                            return;
+                        }
+                        if (task.getException() != null) {
+                            Log.e("Firestore", "Failed to fetch user exercises", task.getException());
+                            Toast.makeText(getActivity(), "Error loading exercises.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }
+
 
     private Map<String, Workout> filterWorkouts(Map<String, Workout> workouts, String query) {
         Map<String, Workout> filteredWorkouts = new HashMap<>();

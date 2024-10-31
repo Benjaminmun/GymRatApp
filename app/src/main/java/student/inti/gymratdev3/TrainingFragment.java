@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +15,18 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -35,8 +40,12 @@ public class TrainingFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
 
-    // List to store all training buttons for filtering
+    // List to store all training views for filtering
     private final List<View> allTrainingViews = new ArrayList<>();
+
+    // ListenerRegistration to manage Firestore listener
+    private ListenerRegistration trainingsListenerRegistration;
+
     private final List<String> defaultTrainings = List.of("Full Body Workout", "Cardio Burn", "Strength Training");
 
     @Override
@@ -65,6 +74,15 @@ public class TrainingFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Remove Firestore listener to prevent memory leaks and crashes
+        if (trainingsListenerRegistration != null) {
+            trainingsListenerRegistration.remove();
+            trainingsListenerRegistration = null;
+        }
+    }
 
     private void initializeViews(View rootView) {
         trainingContainer = rootView.findViewById(R.id.training_container);
@@ -81,7 +99,9 @@ public class TrainingFragment extends Fragment {
         EditText searchEditText = rootView.findViewById(R.id.search_edit_text);
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // No action needed before text changes
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -89,7 +109,9 @@ public class TrainingFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+                // No action needed after text changes
+            }
         });
     }
 
@@ -99,18 +121,25 @@ public class TrainingFragment extends Fragment {
         }
     }
 
-
     private void loadUserTrainings() {
         if (currentUser == null) {
             showSnackbar("User not authenticated");
             return;
         }
 
-        db.collection("trainings")
+        trainingsListenerRegistration = db.collection("trainings")
                 .whereEqualTo("userId", currentUser.getUid())
                 .addSnapshotListener((queryDocumentSnapshots, e) -> {
                     if (e != null) {
-                        showSnackbar("Failed to load trainings");
+                        if (isAdded()) {
+                            showSnackbar("Failed to load trainings");
+                        }
+                        Log.e("TrainingFragment", "Firestore error: ", e);
+                        return;
+                    }
+
+                    if (!isAdded()) {
+                        Log.w("TrainingFragment", "Fragment not attached. Skipping UI updates.");
                         return;
                     }
 
@@ -141,8 +170,12 @@ public class TrainingFragment extends Fragment {
         allTrainingViews.removeAll(viewsToRemove);
     }
 
-
     private void addDefaultTrainingButtonToContainer(String trainingName) {
+        if (!isAdded()) {
+            Log.w("TrainingFragment", "Fragment not attached. Skipping adding default training button.");
+            return;
+        }
+
         View trainingView = LayoutInflater.from(getContext()).inflate(R.layout.default_training_button_layout, null);
         Button trainingButton = trainingView.findViewById(R.id.training_button);
         ImageButton removeButton = trainingView.findViewById(R.id.remove_button);
@@ -162,6 +195,11 @@ public class TrainingFragment extends Fragment {
     }
 
     private void addUserTrainingButtonToContainer(String trainingName, String trainingId) {
+        if (!isAdded()) {
+            Log.w("TrainingFragment", "Fragment not attached. Skipping adding user training button.");
+            return;
+        }
+
         View trainingView = LayoutInflater.from(getContext()).inflate(R.layout.user_training_button_layout, null);
         Button trainingButton = trainingView.findViewById(R.id.user_training_button);
         ImageButton removeButton = trainingView.findViewById(R.id.remove_button);
@@ -181,7 +219,6 @@ public class TrainingFragment extends Fragment {
         allTrainingViews.add(trainingView);
     }
 
-
     private void navigateToTrainingDetail(String trainingId) {
         Intent intent = new Intent(getContext(), TrainingDetailActivity.class);
         intent.putExtra("TRAINING_ID", trainingId); // Pass the document ID
@@ -189,6 +226,11 @@ public class TrainingFragment extends Fragment {
     }
 
     private void removeTrainingPlan(String trainingId, View trainingView) {
+        if (!isAdded()) {
+            Log.w("TrainingFragment", "Fragment not attached. Cannot remove training plan.");
+            return;
+        }
+
         // Create a MaterialAlertDialogBuilder
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
 
@@ -204,13 +246,14 @@ public class TrainingFragment extends Fragment {
                                 trainingContainer.removeView(trainingView);
                                 allTrainingViews.remove(trainingView);
                             })
-                            .addOnFailureListener(e -> showSnackbar("Failed to remove training"));
+                            .addOnFailureListener(e -> {
+                                showSnackbar("Failed to remove training");
+                                Log.e("TrainingFragment", "Error removing training: ", e);
+                            });
                 })
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                 .show(); // Show the dialog
     }
-
-
 
     private void filterTrainings(String query) {
         query = query.toLowerCase();
@@ -224,8 +267,12 @@ public class TrainingFragment extends Fragment {
         }
     }
 
-
     private void showSnackbar(String message) {
-        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show();
+        View view = getView();
+        if (isAdded() && view != null) {
+            Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show();
+        } else {
+            Log.w("TrainingFragment", "Cannot show Snackbar. Fragment not attached or view is null.");
+        }
     }
 }

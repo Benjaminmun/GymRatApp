@@ -10,9 +10,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -21,11 +25,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ProfileFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ProfileFragment extends Fragment {
 
     private Button editProfileButton, changePasswordButton, logoutButton;
@@ -39,14 +38,8 @@ public class ProfileFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static ProfileFragment newInstance(String param1, String param2) {
-        ProfileFragment fragment = new ProfileFragment();
-        Bundle args = new Bundle();
-        args.putString("param1", param1);
-        args.putString("param2", param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    // Remove unused newInstance method if not required
+    // public static ProfileFragment newInstance(String param1, String param2) { ... }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,16 +51,12 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         // Find views by ID
-        editProfileButton = view.findViewById(R.id.edit_profile);
-        changePasswordButton = view.findViewById(R.id.change_password);
-        logoutButton = view.findViewById(R.id.logout);
-        emailTextView = view.findViewById(R.id.email);
-        usernameTextView = view.findViewById(R.id.username);
-        profileImageView = view.findViewById(R.id.profile_picture);
+        initializeViews(view);
 
         // Get the current user
         FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -80,6 +69,11 @@ public class ProfileFragment extends Fragment {
 
             // Load profile image from Firebase Storage
             loadProfileImage();
+        } else {
+            // User is not logged in, redirect to login or show a message
+            showSnackbar("User not authenticated");
+            // Optionally, navigate to LoginActivity
+            navigateToLogin();
         }
 
         // Set click listeners for the buttons
@@ -88,10 +82,31 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // If you have any listeners or bindings, clean them up here
+    }
+
+    // Initialize all UI elements
+    private void initializeViews(View view) {
+        editProfileButton = view.findViewById(R.id.edit_profile);
+        changePasswordButton = view.findViewById(R.id.change_password);
+        logoutButton = view.findViewById(R.id.logout);
+        emailTextView = view.findViewById(R.id.email);
+        usernameTextView = view.findViewById(R.id.username);
+        profileImageView = view.findViewById(R.id.profile_picture);
+    }
+
     // Method to load username from Firestore
     private void loadUsernameFromFirestore(String userId) {
         DocumentReference userRef = firebaseFirestore.collection("users").document(userId);
         userRef.get().addOnCompleteListener(task -> {
+            if (!isAdded()) {
+                // Fragment is not attached, skip UI updates
+                return;
+            }
+
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document != null && document.exists()) {
@@ -105,7 +120,7 @@ public class ProfileFragment extends Fragment {
                     usernameTextView.setText("User"); // Document does not exist
                 }
             } else {
-                Toast.makeText(getActivity(), "Failed to load username", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Failed to load username", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -113,18 +128,18 @@ public class ProfileFragment extends Fragment {
     // Set click listeners for the buttons
     private void setButtonListeners() {
         editProfileButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), EditProfileActivity.class);
+            Intent intent = new Intent(getContext(), EditProfileActivity.class);
             startActivity(intent);
         });
 
         changePasswordButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), ChangePasswordActivity.class);
+            Intent intent = new Intent(getContext(), ChangePasswordActivity.class);
             startActivity(intent);
         });
 
         logoutButton.setOnClickListener(v -> {
             firebaseAuth.signOut();
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            Intent intent = new Intent(getContext(), LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             if (getActivity() != null) {
@@ -135,16 +150,51 @@ public class ProfileFragment extends Fragment {
 
     // Method to load profile image from Firebase Storage
     private void loadProfileImage() {
-        StorageReference storageReference = firebaseStorage.getReference("profile_pictures/" + firebaseAuth.getCurrentUser().getUid() + ".jpg");
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user == null) {
+            // User is not authenticated, skip loading image
+            return;
+        }
+
+        StorageReference storageReference = firebaseStorage.getReference("profile_pictures/" + user.getUid() + ".jpg");
         storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+            if (!isAdded()) {
+                // Fragment is not attached, skip UI updates
+                return;
+            }
             // Load image with Glide and apply circle crop
-            Glide.with(getActivity())
+            Glide.with(this)
                     .load(uri)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .circleCrop() // Apply circle crop transformation
+                    .placeholder(R.drawable.ic_profile_placeholder) // Placeholder image
+                    .error(R.drawable.ic_profile_placeholder) // Error image
                     .into(profileImageView);
         }).addOnFailureListener(e -> {
+            if (!isAdded()) {
+                // Fragment is not attached, skip UI updates
+                return;
+            }
             profileImageView.setImageResource(R.drawable.ic_profile_placeholder);
-            Toast.makeText(getActivity(), "Failed to load image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Failed to load image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         });
+    }
+
+    // Navigate to LoginActivity if user is not authenticated
+    private void navigateToLogin() {
+        Intent intent = new Intent(getContext(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        if (getActivity() != null) {
+            getActivity().finish();
+        }
+    }
+
+    // Show a Snackbar message
+    private void showSnackbar(String message) {
+        View view = getView();
+        if (isAdded() && view != null) {
+            Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show();
+        }
     }
 }
