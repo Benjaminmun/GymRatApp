@@ -5,14 +5,14 @@
     <!-- Focus Area options -->
 
     <string-array name="focus_areas">
-        <item>Biceps</item>
-        <item>Triceps</item>
-        <item>Chest</item>
-        <item>Back</item>
-        <item>Legs</item>
         <item>Abs</item>
-        <item>Shoulders</item>
+        <item>Back</item>
+        <item>Biceps</item>
+        <item>Chest</item>
         <item>Full Body</item>
+        <item>Legs</item>
+        <item>Shoulders</item>
+        <item>Triceps</item>
     </string-array>
 
     <!-- Equipment options -->
@@ -39,14 +39,14 @@
     <string-array name="exercise_categories">
         <item>Arms</item>
         <item>Back</item>
-        <item>Legs</item>
+        <item>Cardio</item>
         <item>Chest</item>
         <item>Core</item>
-        <item>Glutes</item>
-        <item>Shoulders</item>
         <item>Full Body</item>
-        <item>Cardio</item>
+        <item>Glutes</item>
+        <item>Legs</item>
         <item>Olympic</item>
+        <item>Shoulders</item>
     </string-array>
 
     <!-- Accessibility strings -->

@@ -1,5 +1,6 @@
 package student.inti.gymratdev3;
 
+import android.annotation.SuppressLint;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
@@ -76,22 +77,12 @@ public class StartWorkoutActivity extends AppCompatActivity {
         startCountdown();
     }
 
+    @SuppressLint("MissingSuperCall")
     @Override
     public void onBackPressed() {
         // Pause the countdown timer
         countdownHandler.removeCallbacksAndMessages(null);
-
-        new AlertDialog.Builder(this)
-                .setTitle("Cancel Workout")
-                .setMessage("Are you sure you want to cancel the workout? Your progress will not be saved.")
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    super.onBackPressed(); // Cancel the workout and return to the previous screen
-                })
-                .setNegativeButton("No", (dialog, which) -> {
-                    // Resume the countdown if user cancels the dialog
-                    resumeCountdown();
-                })
-                .show();
+        showPauseDialog();
     }
 
     private void resumeCountdown() {
@@ -328,8 +319,14 @@ public class StartWorkoutActivity extends AppCompatActivity {
         Button btnCancel = dialogView.findViewById(R.id.btnCancel);
 
         btnResume.setOnClickListener(v -> {
-            startWorkout();
-            dialog.dismiss();
+            if (countdown[0] > 0) {
+                resumeCountdown();
+                dialog.dismiss();
+            } else {
+                startWorkout();
+                dialog.dismiss();
+            }
+
         });
 
         btnRestart.setOnClickListener(v -> {

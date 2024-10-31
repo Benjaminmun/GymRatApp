@@ -9,7 +9,6 @@
 
     <!-- Exercise Spinner -->
 
-    <!-- Reps Field -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -26,6 +25,7 @@
             android:spinnerMode="dropdown" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Reps Field -->
     <com.google.android.material.textfield.TextInputLayout
         style="@style/CustomTextInputLayout"
         android:layout_width="0dp"
