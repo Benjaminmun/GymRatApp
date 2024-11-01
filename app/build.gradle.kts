@@ -47,11 +47,12 @@ dependencies {
     implementation("com.google.firebase:firebase-storage:20.1.0")
     implementation("com.github.bumptech.glide:glide:4.14.2")
     annotationProcessor("com.github.bumptech.glide:compiler:4.14.2")
-    implementation("com.google.firebase:firebase-firestore:24.4.0")
+    implementation("com.google.firebase:firebase-firestore:25.1.1")
     implementation("com.squareup.picasso:picasso:2.71828")
     implementation ("androidx.room:room-runtime:2.5.2")
     annotationProcessor ("androidx.room:room-compiler:2.5.2")
     implementation ("androidx.room:room-ktx:2.5.2")
+    
 
     implementation("com.google.android.material:material:1.9.0")
 
@@ -65,5 +66,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+
 
 }

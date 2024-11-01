@@ -16,11 +16,23 @@ import com.google.firebase.firestore.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import androidx.core.app.NotificationCompat;
+
+
 public class StartWorkoutActivity extends AppCompatActivity {
 
     private TextView timerTextView, countdownTextView, trainingNameTextView;
     private LinearLayout exercisesContainer;
     private Button pauseButton, finishButton;
+    private static final String CHANNEL_ID = "workout_channel";
+    private static final int NOTIFICATION_ID = 1;
+    static final String ACTION_PAUSE_WORKOUT = "PAUSE_WORKOUT";
+    static final String ACTION_RESUME_WORKOUT = "RESUME_WORKOUT";
+    private NotificationManager notificationManager;
 
     private Handler handler = new Handler();
     private long startTime = 0L, timeInMillis = 0L, pauseOffset = 0L;
@@ -40,6 +52,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_workout);
 
+
         // Change status bar color to match button color
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -53,6 +66,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
         pauseButton = findViewById(R.id.pauseButton);
         finishButton = findViewById(R.id.finishButton);
         trainingNameTextView = findViewById(R.id.trainingNameTextView);
+
 
         // Ensure only countdown is shown initially
         countdownTextView.setVisibility(View.VISIBLE);
@@ -115,8 +129,6 @@ public class StartWorkoutActivity extends AppCompatActivity {
         });
     }
 
-
-
     private void startCountdown() {
         countdownTextView.setVisibility(View.VISIBLE);
         timerTextView.setVisibility(View.GONE);
@@ -156,6 +168,62 @@ public class StartWorkoutActivity extends AppCompatActivity {
         });
     }
 
+    private void createNotification() {
+        Log.d(TAG, "Creating notification");
+
+        Intent pauseIntent = new Intent(this, NotificationReceiver.class);
+        pauseIntent.setAction(ACTION_PAUSE_WORKOUT);
+        PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        Intent resumeIntent = new Intent(this, NotificationReceiver.class);
+        resumeIntent.setAction(ACTION_RESUME_WORKOUT);
+        PendingIntent resumePendingIntent = PendingIntent.getBroadcast(this, 1, resumeIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Workout Timer")
+                .setSmallIcon(R.drawable.ic_fitness) // Replace with your app's notification icon
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setOngoing(true)
+                .addAction(R.drawable.ic_pause, "Pause", pausePendingIntent)
+                .addAction(R.drawable.ic_play, "Resume", resumePendingIntent)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
+    }
+
+
+
+    private void updateNotification() {
+        String currentTime = timerTextView.getText().toString();
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Workout Timer")
+                .setContentText(currentTime)
+                .setSmallIcon(R.drawable.ic_fitness) // Replace with your app's notification icon
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setOngoing(true)
+                .addAction(R.drawable.ic_pause, "Pause", getPausePendingIntent())
+                .addAction(R.drawable.ic_play, "Resume", getResumePendingIntent())
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
+    }
+
+    private PendingIntent getPausePendingIntent() {
+        Intent pauseIntent = new Intent(this, NotificationReceiver.class);
+        pauseIntent.setAction(ACTION_PAUSE_WORKOUT);
+        return PendingIntent.getBroadcast(this, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    }
+
+    private PendingIntent getResumePendingIntent() {
+        Intent resumeIntent = new Intent(this, NotificationReceiver.class);
+        resumeIntent.setAction(ACTION_RESUME_WORKOUT);
+        return PendingIntent.getBroadcast(this, 1, resumeIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    }
+
+
+
+
     private void playTickSound() {
         MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.tick);
         mediaPlayer.start();
@@ -167,6 +235,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
             startTime = System.currentTimeMillis();
             handler.post(timerRunnable);
             isRunning = true;
+            createNotification(); // Create notification on start
             Toast.makeText(this, "Workout started!", Toast.LENGTH_SHORT).show();
         }
     }
@@ -176,6 +245,7 @@ public class StartWorkoutActivity extends AppCompatActivity {
             pauseOffset += System.currentTimeMillis() - startTime;
             handler.removeCallbacks(timerRunnable);
             isRunning = false;
+            updateNotification(); // Update notification on pause
             Toast.makeText(this, "Workout paused!", Toast.LENGTH_SHORT).show();
         }
     }
@@ -301,9 +371,11 @@ public class StartWorkoutActivity extends AppCompatActivity {
 
             String time = String.format("%02d:%02d", minutes, seconds);
             timerTextView.setText(time);
+            updateNotification(); // Update notification with current time
             handler.postDelayed(this, 1000);
         }
     };
+
 
     public void showPauseDialog() {
         if (isRunning) pauseWorkout();

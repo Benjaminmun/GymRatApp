@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -71,6 +72,7 @@ public class ReportFragment extends Fragment {
         db.collection("users")
                 .document(userId)
                 .collection("workout_history")
+                .orderBy("date", Query.Direction.DESCENDING) // Order by timestamp in descending order
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -133,5 +135,6 @@ public class ReportFragment extends Fragment {
                     }
                 });
     }
+
 
 }
