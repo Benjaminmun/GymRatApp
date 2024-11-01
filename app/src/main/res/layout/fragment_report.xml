@@ -31,7 +31,7 @@
             android:id="@+id/total_minutes_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Total Training Time: 0 mins"
+            android:text="Total Training Time: 0"
             android:textSize="18sp"
             android:textColor="#3100d4"
             android:textStyle="bold"

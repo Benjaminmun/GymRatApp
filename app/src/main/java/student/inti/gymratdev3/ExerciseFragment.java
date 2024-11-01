@@ -29,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -169,25 +170,25 @@ public class ExerciseFragment extends Fragment {
         defaultArmsWorkouts.put("Bicep Curl with Dumbbell", new Workout(
                 "Biceps, Forearms",
                 "Dumbbell",
-                "Stand with feet shoulder width apart. Hold a dumbbell in each hand in an underhand grip...",
-                "1. Curl the dumbbells up until your forearms touch your chest...\n" +
-                        "2. Pause for a few seconds and squeeze your bicep...\n" +
+                "Stand with feet shoulder width apart. Hold a dumbbell in each hand in an underhand grip.",
+                "1. Curl the dumbbells up until your forearms touch your chest.\n" +
+                        "2. Pause for a few seconds and squeeze your bicep.\n" +
                         "3. Lower the dumbbells to the starting position and repeat."
         ));
 
         defaultArmsWorkouts.put("Diamond Push-Up", new Workout(
                 "Chest, Triceps",
                 "Bodyweight",
-                "Lie prone on the floor with feet together and arms extended...",
-                "1. Inhale and lower your body until your chest almost touches the floor...\n" +
+                "Lie prone on the floor with feet together and arms extended.",
+                "1. Inhale and lower your body until your chest almost touches the floor.\n" +
                         "2. Exhale and raise your body back to the starting position and repeat."
         ));
 
         defaultArmsWorkouts.put("Hammer Curl with Cable", new Workout(
                 "Biceps, Forearms",
                 "Cable",
-                "Stand with feet shoulder width apart...",
-                "1. Squeeze your biceps to bend your elbows and curl the rope up...\n" +
+                "Stand with feet shoulder width apart.",
+                "1. Squeeze your biceps to bend your elbows and curl the rope up.\n" +
                         "2. Return to the starting position slowly and repeat."
         ));
 
@@ -195,17 +196,79 @@ public class ExerciseFragment extends Fragment {
         defaultBackWorkouts.put("Bent-over Row (Reverse Grip) Barbell", new Workout(
                 "Back, Traps, Biceps",
                 "Barbell",
-                "Stand with feet shoulder width apart...",
-                "1. Exhale and squeeze your lats muscle to lift the barbell...\n" +
+                "Stand with feet shoulder width apart.",
+                "1. Exhale and squeeze your lats muscle to lift the barbell.\n" +
                         "2. Pause, slowly lower the barbell, and repeat."
+        ));
+
+        // Cardio Workouts
+        defaultCardioWorkouts.put("Jumping Jacks", new Workout(
+                "Full Body, Cardiovascular",
+                "Bodyweight",
+                "Stand upright with your legs together and arms at your sides.",
+                "1. Jump while spreading your legs and raising your arms overhead.\n" +
+                        "2. Return to the starting position and repeat."
+        ));
+
+        // Chest Workouts
+        defaultChestWorkouts.put("Bench Press", new Workout(
+                "Chest, Triceps",
+                "Barbell",
+                "Lie back on a bench with a barbell in an overhand grip.",
+                "1. Lower the barbell until it touches your chest.\n" +
+                        "2. Press the bar back up to the starting position."
+        ));
+
+        defaultChestWorkouts.put("Chest Fly", new Workout(
+                "Chest, Shoulders",
+                "Dumbbell",
+                "Lie back on a bench with dumbbells in each hand.",
+                "1. Lower the dumbbells to the side with a slight bend in your elbows.\n" +
+                        "2. Squeeze your chest and bring the dumbbells back up."
+        ));
+
+        // Core Workouts
+        defaultCoreWorkouts.put("Plank", new Workout(
+                "Core",
+                "Bodyweight",
+                "Lie face down on the floor, supporting your body with your forearms and toes.",
+                "1. Keep your core tight and hold the position.\n" +
+                        "2. Hold for as long as possible."
+        ));
+
+        // Full Body Workouts
+        defaultFullBodyWorkouts.put("Burpees", new Workout(
+                "Full Body",
+                "Bodyweight",
+                "Stand with feet shoulder width apart...",
+                "1. Drop into a squat position and kick your legs back into a push-up position.\n" +
+                        "2. Jump back to your feet and leap up with arms overhead."
+        ));
+
+        // Glutes Workouts
+        defaultGlutesWorkouts.put("Glute Bridge", new Workout(
+                "Glutes, Core",
+                "Bodyweight",
+                "Lie on your back with knees bent and feet flat on the floor.",
+                "1. Squeeze your glutes and lift your hips towards the ceiling.\n" +
+                        "2. Lower back down and repeat."
+        ));
+
+        // Legs Workouts
+        defaultLegWorkouts.put("Squats", new Workout(
+                "Legs, Glutes",
+                "Bodyweight",
+                "Stand with feet shoulder width apart...",
+                "1. Lower your body into a squat position until your thighs are parallel to the ground.\n" +
+                        "2. Push back up to the starting position."
         ));
 
         // Olympic Workouts
         defaultOlympicWorkouts.put("Clean and Press with Barbell", new Workout(
                 "Full Body",
                 "Barbell",
-                "Squat down with feet shoulder width apart...",
-                "1. Drive your hips up and straighten your legs to pull the barbell...\n" +
+                "Squat down with feet shoulder width apart.",
+                "1. Drive your hips up and straighten your legs to pull the barbell.\n" +
                         "2. Press the bar overhead until your arms are straight."
         ));
 
@@ -213,7 +276,7 @@ public class ExerciseFragment extends Fragment {
                 "Full Body",
                 "Barbell",
                 "Squat down with feet shoulder width apart...",
-                "1. Drive your hips up and straighten your legs to pull the barbell...\n" +
+                "1. Drive your hips up and straighten your legs to pull the barbell.\n" +
                         "2. Once the bar passes your mid-thigh, jump slightly and drop your body under the bar."
         ));
 
@@ -221,50 +284,19 @@ public class ExerciseFragment extends Fragment {
                 "Full Body",
                 "Barbell",
                 "Put your feet under the bar. Bend down to grip the bar...",
-                "1. Drive your hips up and straighten your legs to pull the barbell...\n" +
-                        "2. As you lift the barbell, lower your hips to a front squat position..."
+                "1. Drive your hips up and straighten your legs to pull the barbell.\n" +
+                        "2. As you lift the barbell, lower your hips to a front squat position."
         ));
 
-        // Chest Workouts
-        defaultChestWorkouts.put("Bench Press", new Workout(
-                "Chest, Triceps",
-                "Barbell",
-                "Lie back on a bench with a barbell in an overhand grip...",
-                "1. Lower the barbell until it touches your chest...\n" +
-                        "2. Press the bar back up to the starting position."
-        ));
-
-        defaultChestWorkouts.put("Chest Fly", new Workout(
-                "Chest, Shoulders",
-                "Dumbbell",
-                "Lie back on a bench with dumbbells in each hand...",
-                "1. Lower the dumbbells to the side with a slight bend in your elbows...\n" +
-                        "2. Squeeze your chest and bring the dumbbells back up."
-        ));
-
-        defaultCoreWorkouts.put("Plank", new Workout(
-                "Core",
-                "Bodyweight",
-                "Lie face down on the floor, supporting your body with your forearms and toes...",
-                "1. Keep your core tight and hold the position...\n" +
-                        "2. Hold for as long as possible."
-        ));
-
-        defaultGlutesWorkouts.put("Glute Bridge", new Workout(
-                "Glutes, Core",
-                "Bodyweight",
-                "Lie on your back with knees bent and feet flat on the floor...",
-                "1. Squeeze your glutes and lift your hips towards the ceiling...\n" +
-                        "2. Lower back down and repeat."
-        ));
-
+        // Shoulders Workouts
         defaultShouldersWorkouts.put("Shoulder Press", new Workout(
                 "Shoulders",
                 "Dumbbell",
                 "Sit on a bench with dumbbells in each hand at shoulder height...",
-                "1. Press the dumbbells overhead until your arms are straight...\n" +
+                "1. Press the dumbbells overhead until your arms are straight.\n" +
                         "2. Lower back to the starting position."
         ));
+
     }
 
 
@@ -272,14 +304,14 @@ public class ExerciseFragment extends Fragment {
         // Setup filter button listeners to filter workouts by category
         filterArmsButton.setOnClickListener(v -> filterWorkoutsByCategory("Arms", defaultArmsWorkouts));
         filterBackButton.setOnClickListener(v -> filterWorkoutsByCategory("Back", defaultBackWorkouts));
-        filterOlympicButton.setOnClickListener(v -> filterWorkoutsByCategory("Olympic", defaultOlympicWorkouts));
-        filterLegButton.setOnClickListener(v -> filterWorkoutsByCategory("Legs", defaultLegWorkouts));
+        filterCardioButton.setOnClickListener(v -> filterWorkoutsByCategory("Cardio", defaultCardioWorkouts));
         filterChestButton.setOnClickListener(v -> filterWorkoutsByCategory("Chest", defaultChestWorkouts));
         filterCoreButton.setOnClickListener(v -> filterWorkoutsByCategory("Core", defaultCoreWorkouts));
-        filterGlutesButton.setOnClickListener(v -> filterWorkoutsByCategory("Glutes", defaultGlutesWorkouts));
-        filterShouldersButton.setOnClickListener(v -> filterWorkoutsByCategory("Shoulders", defaultShouldersWorkouts));
-        filterCardioButton.setOnClickListener(v -> filterWorkoutsByCategory("Cardio", defaultCardioWorkouts));
         filterFullBodyButton.setOnClickListener(v -> filterWorkoutsByCategory("Full Body", defaultFullBodyWorkouts));
+        filterGlutesButton.setOnClickListener(v -> filterWorkoutsByCategory("Glutes", defaultGlutesWorkouts));
+        filterLegButton.setOnClickListener(v -> filterWorkoutsByCategory("Legs", defaultLegWorkouts));
+        filterOlympicButton.setOnClickListener(v -> filterWorkoutsByCategory("Olympic", defaultOlympicWorkouts));
+        filterShouldersButton.setOnClickListener(v -> filterWorkoutsByCategory("Shoulders", defaultShouldersWorkouts));
         filterAllButton.setOnClickListener(v -> loadAllWorkouts());
     }
 
@@ -297,43 +329,37 @@ public class ExerciseFragment extends Fragment {
         workoutContainer.removeAllViews();
         addWorkoutCategory("Arms", defaultArmsWorkouts);
         addWorkoutCategory("Back", defaultBackWorkouts);
-        addWorkoutCategory("Olympic", defaultOlympicWorkouts);
-        addWorkoutCategory("Leg", defaultLegWorkouts);
+        addWorkoutCategory("Cardio", defaultCardioWorkouts);
         addWorkoutCategory("Chest", defaultChestWorkouts);
         addWorkoutCategory("Core", defaultCoreWorkouts);
-        addWorkoutCategory("Glutes", defaultGlutesWorkouts);
-        addWorkoutCategory("Shoulders", defaultShouldersWorkouts);
         addWorkoutCategory("Full Body", defaultFullBodyWorkouts);
-        addWorkoutCategory("Cardio", defaultCardioWorkouts);
+        addWorkoutCategory("Glutes", defaultGlutesWorkouts);
+        addWorkoutCategory("Legs", defaultLegWorkouts);
+        addWorkoutCategory("Olympic", defaultOlympicWorkouts);
+        addWorkoutCategory("Shoulders", defaultShouldersWorkouts);
     }
 
     private void saveDefaultWorkoutsToGlobalCollection() {
-        // Check if the default_workouts collection is empty
-        db.collection("default_workouts").get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult().isEmpty()) {
-                        Log.d("Firestore", "Saving default workouts to global collection...");
-                        // Save all categories to Firestore
-                        saveWorkoutCategoryToFirestore("Arms", defaultArmsWorkouts);
-                        saveWorkoutCategoryToFirestore("Back", defaultBackWorkouts);
-                        saveWorkoutCategoryToFirestore("Olympic", defaultOlympicWorkouts);
-                        saveWorkoutCategoryToFirestore("Legs", defaultLegWorkouts);
-                        saveWorkoutCategoryToFirestore("Chest", defaultChestWorkouts);
-                        saveWorkoutCategoryToFirestore("Core", defaultCoreWorkouts);
-                        saveWorkoutCategoryToFirestore("Glutes", defaultGlutesWorkouts);
-                        saveWorkoutCategoryToFirestore("Shoulders", defaultShouldersWorkouts);
-                        saveWorkoutCategoryToFirestore("Full Body", defaultFullBodyWorkouts);
-                        saveWorkoutCategoryToFirestore("Cardio", defaultCardioWorkouts);
-                    } else {
-                        Log.d("Firestore", "Default workouts already exist.");
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("Firestore", "Error fetching default workouts", e));
+        Log.d("Firestore", "Saving default workouts to global collection...");
+
+        // Save all workout categories to Firestore (overwrite or merge if they exist)
+        saveWorkoutCategoryToFirestore("Arms", defaultArmsWorkouts);
+        saveWorkoutCategoryToFirestore("Back", defaultBackWorkouts);
+        saveWorkoutCategoryToFirestore("Cardio", defaultCardioWorkouts);
+        saveWorkoutCategoryToFirestore("Chest", defaultChestWorkouts);
+        saveWorkoutCategoryToFirestore("Core", defaultCoreWorkouts);
+        saveWorkoutCategoryToFirestore("Full Body", defaultFullBodyWorkouts);
+        saveWorkoutCategoryToFirestore("Glutes", defaultGlutesWorkouts);
+        saveWorkoutCategoryToFirestore("Legs", defaultLegWorkouts);
+        saveWorkoutCategoryToFirestore("Olympic", defaultOlympicWorkouts);
+        saveWorkoutCategoryToFirestore("Shoulders", defaultShouldersWorkouts);
     }
 
     private void saveWorkoutCategoryToFirestore(String category, Map<String, Workout> workouts) {
         for (Map.Entry<String, Workout> entry : workouts.entrySet()) {
-            String workoutName = entry.getKey(); // Use workout name as the document ID
+            String workoutName = entry.getKey(); // Use workout name as document ID
+
+            // Create a map to store workout data
             Map<String, Object> workoutData = new HashMap<>();
             workoutData.put("exercise_name", workoutName);
             workoutData.put("category", category);
@@ -342,15 +368,16 @@ public class ExerciseFragment extends Fragment {
             workoutData.put("preparation", entry.getValue().getPreparation());
             workoutData.put("execution", entry.getValue().getExecution());
 
-            // Save to default_workouts collection using the workout name as document ID
+            // Save to Firestore, using SetOptions.merge() to update or add if it exists
             db.collection("default_workouts").document(workoutName)
-                    .set(workoutData)
+                    .set(workoutData, SetOptions.merge())
                     .addOnSuccessListener(aVoid ->
-                            Log.d("Firestore", "Workout saved: " + workoutName))
+                            Log.d("Firestore", "Workout saved or updated: " + workoutName))
                     .addOnFailureListener(e ->
                             Log.e("Firestore", "Error saving workout: " + workoutName, e));
         }
     }
+
 
 
 
@@ -367,30 +394,39 @@ public class ExerciseFragment extends Fragment {
 
 
     private void fetchAndAddUserWorkoutsToCategory(String category) {
-        Log.d("Firestore", "Fetching user workouts for category: " + category); // Add log here
+        Log.d("Firestore", "Fetching user workouts for category: " + category);
         db.collection("users").document(userId).collection("custom_exercises")
                 .whereEqualTo("category", category).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Log.d("Firestore", "Query returned: " + task.getResult().size() + " documents"); // Log result size
+                        if (!isAdded()) {
+                            Log.w("ExerciseFragment", "Fragment not attached to activity. Skipping UI update.");
+                            return;
+                        }
+                        Log.d("Firestore", "Query returned: " + task.getResult().size() + " documents");
                         if (!task.getResult().isEmpty()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d("Firestore", "Adding user workout: " + document.getString("exercise_name")); // Log each document
                                 addUserWorkoutButton(document.getString("exercise_name"),
-                                        new String[]{document.getString("execution"),
+                                        new String[]{
+                                                document.getString("execution"),
                                                 document.getString("focus_area"),
                                                 document.getString("equipment"),
-                                                document.getString("preparation")});
+                                                document.getString("preparation")
+                                        }
+                                );
                             }
                         } else {
                             Log.d("Firestore", "No user workouts found for category: " + category);
                         }
                     } else {
                         Log.e("Firestore", "Error fetching user exercises: ", task.getException());
-                        Toast.makeText(getActivity(), "Failed to load user exercises.", Toast.LENGTH_SHORT).show();
+                        if (isAdded()) {
+                            Toast.makeText(getActivity(), "Failed to load user exercises.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }
+
 
 
 
@@ -412,29 +448,48 @@ public class ExerciseFragment extends Fragment {
     }
 
     private void fetchAndAddUserWorkoutsToCategoryAll(String category) {
+        Log.d("Firestore", "Fetching user workouts for category: " + category);
         db.collection("users").document(userId).collection("custom_exercises")
                 .whereEqualTo("category", category).get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        Log.d("Firestore", "Query returned: " + task.getResult().size() + " documents"); // Log result size
-
-                        // Add a label for user workouts if any are found
-                        TextView userCategoryLabel = addCategoryLabel("USER " + category.toUpperCase() + " WORKOUTS");
-                        userCategoryLabel.setTextColor(Color.parseColor("#FF4500"));
-                        userCategoryLabel.setTypeface(null, Typeface.BOLD);
-                        userCategoryLabel.setGravity(Gravity.CENTER);
-
-                        // Add each user workout to the UI
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            addUserWorkoutButton(document.getString("exercise_name"),
-                                    new String[]{document.getString("execution"),
-                                            document.getString("focus_area"),
-                                            document.getString("equipment"),
-                                            document.getString("preparation")});
+                    if (task.isSuccessful()) {
+                        if (!isAdded()) {
+                            Log.w("ExerciseFragment", "Fragment not attached to activity. Skipping UI update.");
+                            return;
                         }
-                    } else if (task.getException() != null) {
+                        Log.d("Firestore", "Query returned: " + task.getResult().size() + " documents");
+
+                        if (!task.getResult().isEmpty()) {
+                            TextView userCategoryLabel = addCategoryLabel("USER " + category.toUpperCase() + " WORKOUTS");
+
+                            // Check if the label was successfully created
+                            if (userCategoryLabel != null) {
+                                userCategoryLabel.setTextColor(Color.parseColor("#FF4500"));
+                                userCategoryLabel.setTypeface(null, Typeface.BOLD);
+                                userCategoryLabel.setGravity(Gravity.CENTER);
+                            } else {
+                                Log.w("ExerciseFragment", "Failed to add category label. Skipping UI updates for this category.");
+                                return;
+                            }
+
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                addUserWorkoutButton(document.getString("exercise_name"),
+                                        new String[]{
+                                                document.getString("execution"),
+                                                document.getString("focus_area"),
+                                                document.getString("equipment"),
+                                                document.getString("preparation")
+                                        }
+                                );
+                            }
+                        } else {
+                            Log.d("Firestore", "No user workouts found for category: " + category);
+                        }
+                    } else {
                         Log.e("Firestore", "Error fetching user exercises: ", task.getException());
-                        Toast.makeText(getActivity(), "Failed to load user exercises.", Toast.LENGTH_SHORT).show();
+                        if (isAdded()) {
+                            Toast.makeText(getActivity(), "Failed to load user exercises.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }
@@ -455,14 +510,20 @@ public class ExerciseFragment extends Fragment {
 
 
     private TextView addCategoryLabel(String text) {
+        if (!isAdded()) {
+            Log.w("ExerciseFragment", "Fragment not attached to activity. Cannot add category label.");
+            return null;
+        }
+
         // Add a label to separate workout categories
-        TextView label = new TextView(getActivity());
+        TextView label = new TextView(getContext());
         label.setText(text);
         label.setTextSize(18);
         label.setPadding(0, 10, 0, 10);
         workoutContainer.addView(label);
         return label;
     }
+
 
     private void addWorkoutButton(String name, Workout workout) {
         addWorkoutButton(name, new String[]{workout.getExecution(), workout.getFocusArea(), workout.getEquipment(), workout.getPreparation()});
@@ -591,16 +652,16 @@ public class ExerciseFragment extends Fragment {
 
 
     private void fetchAndFilterUserWorkouts(String query) {
-        // Fetch user workouts filtered by the search query from Firestore
         db.collection("users").document(userId).collection("custom_exercises")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        Log.d("Firestore", "Query returned: " + task.getResult().size() + " documents"); // Log result size
+                        if (!isAdded()) {
+                            Log.w("ExerciseFragment", "Fragment not attached to activity. Skipping UI update.");
+                            return;
+                        }
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String exerciseName = document.getString("exercise_name");
-
-                            // Check if the exercise name contains the search query
                             if (exerciseName != null && exerciseName.toLowerCase().contains(query.toLowerCase())) {
                                 String[] details = {
                                         document.getString("execution"),
@@ -608,17 +669,22 @@ public class ExerciseFragment extends Fragment {
                                         document.getString("equipment"),
                                         document.getString("preparation")
                                 };
-
-                                // Add the user workout button without category labels
                                 addUserWorkoutButton(exerciseName, details);
                             }
                         }
-                    } else if (task.getException() != null) {
-                        Log.e("Firestore", "Failed to fetch user exercises", task.getException());
-                        Toast.makeText(getActivity(), "Error loading exercises.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        if (!isAdded()) {
+                            Log.w("ExerciseFragment", "Fragment not attached to activity. Skipping toast.");
+                            return;
+                        }
+                        if (task.getException() != null) {
+                            Log.e("Firestore", "Failed to fetch user exercises", task.getException());
+                            Toast.makeText(getActivity(), "Error loading exercises.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }
+
 
     private Map<String, Workout> filterWorkouts(Map<String, Workout> workouts, String query) {
         Map<String, Workout> filteredWorkouts = new HashMap<>();

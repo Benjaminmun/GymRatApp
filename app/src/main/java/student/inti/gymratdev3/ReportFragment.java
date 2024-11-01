@@ -22,6 +22,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 
 public class ReportFragment extends Fragment {
 
@@ -75,32 +76,62 @@ public class ReportFragment extends Fragment {
                     if (task.isSuccessful()) {
                         workoutHistoryList.clear(); // Clear old data
                         int totalMinutes = 0;
+                        int totalSeconds = 0;
                         int totalExercises = 0;
 
                         for (QueryDocumentSnapshot doc : task.getResult()) {
                             Map<String, Object> data = doc.getData();
                             workoutHistoryList.add(data); // Add new data
 
-                            // Calculate total minutes and exercises
-                            if (data.containsKey("time")) {
-                                totalMinutes += ((Long) data.get("time")).intValue(); // Time in mins
+                            // Calculate total minutes and seconds
+                            if (data.containsKey("totalTime")) {
+                                String totalTimeStr = (String) data.get("totalTime");
+
+                                try {
+                                    // Split the string into minutes and seconds
+                                    String[] timeParts = totalTimeStr.split(":");
+                                    int minutes = Integer.parseInt(timeParts[0]);
+                                    int seconds = Integer.parseInt(timeParts[1]);
+
+                                    // Accumulate minutes and seconds separately
+                                    totalMinutes += minutes;
+                                    totalSeconds += seconds;
+                                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                                    Log.e(TAG, "Invalid totalTime format: " + totalTimeStr, e);
+                                }
                             }
+
+                            // Calculate total exercises
                             if (data.containsKey("exercises")) {
                                 totalExercises += ((List<?>) data.get("exercises")).size(); // Exercise count
                             }
                         }
 
+                        // Convert excess seconds to minutes
+                        totalMinutes += totalSeconds / 60;
+                        totalSeconds = totalSeconds % 60;
+
+                        // Display the total time with correct pluralization
+                        String totalTimeDisplay = String.format(
+                                Locale.getDefault(), // Explicitly specify locale
+                                "Total Training Time: %d min%s %d sec%s",
+                                totalMinutes,
+                                (totalMinutes != 1 ? "s" : ""),
+                                totalSeconds,
+                                (totalSeconds != 1 ? "s" : "")
+                        );
+
                         // Update Stats Views
-                        totalMinutesTextView.setText(String.format("Total Training Time: %d mins", totalMinutes));
-                        totalExercisesTextView.setText(String.format("Total Exercises: %d", totalExercises));
+                        totalMinutesTextView.setText(totalTimeDisplay);
+                        totalExercisesTextView.setText(String.format(Locale.getDefault(), "Total Exercises: %d", totalExercises));
 
                         adapter.notifyDataSetChanged(); // Refresh the RecyclerView
                         Log.d(TAG, "Workout history loaded.");
                     } else {
-                        Toast.makeText(getContext(), "Failed to load history.",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Failed to load history.", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "Error loading history", task.getException());
                     }
                 });
     }
+
 }

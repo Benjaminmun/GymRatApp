@@ -98,6 +98,72 @@
                 android:background="@drawable/button_gradient"
                 android:layout_marginEnd="8dp" />
 
+            <!-- Cardio Button -->
+            <Button
+                android:id="@+id/cardio_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cardio"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Chest Button -->
+            <Button
+                android:id="@+id/chest_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chest"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Core Button -->
+            <Button
+                android:id="@+id/core_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Core"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Full Body Button -->
+            <Button
+                android:id="@+id/fullbody_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Full Body"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Glutes Button -->
+            <Button
+                android:id="@+id/glutes_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Glutes"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Legs Button -->
+            <Button
+                android:id="@+id/leg_category_button"
+                style="@style/MyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Legs"
+                android:textColor="#fff"
+                android:background="@drawable/button_gradient"
+                android:layout_marginEnd="8dp" />
+
             <!-- Olympic Button -->
             <Button
                 android:id="@+id/olympic_category_button"
@@ -110,37 +176,7 @@
                 android:background="@drawable/button_gradient"
                 android:layout_marginEnd="8dp" />
 
-            <!-- Additional Buttons -->
-            <Button
-                android:id="@+id/chest_category_button"
-                style="@style/MyButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Chest"
-                android:textColor="#fff"
-                android:background="@drawable/button_gradient"
-                android:layout_marginEnd="8dp" />
-
-            <Button
-                android:id="@+id/core_category_button"
-                style="@style/MyButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Core"
-                android:textColor="#fff"
-                android:background="@drawable/button_gradient"
-                android:layout_marginEnd="8dp" />
-
-            <Button
-                android:id="@+id/glutes_category_button"
-                style="@style/MyButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Glutes"
-                android:textColor="#fff"
-                android:background="@drawable/button_gradient"
-                android:layout_marginEnd="8dp" />
-
+            <!-- Shoulders Button -->
             <Button
                 android:id="@+id/shoulder_category_button"
                 style="@style/MyButton"
@@ -148,37 +184,8 @@
                 android:layout_height="wrap_content"
                 android:text="Shoulders"
                 android:textColor="#fff"
-                android:background="@drawable/button_gradient"
-                android:layout_marginEnd="8dp" />
-
-            <Button
-                android:id="@+id/leg_category_button"
-                style="@style/MyButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Legs"
-                android:textColor="#fff"
-                android:background="@drawable/button_gradient"
-                android:layout_marginEnd="8dp" />
-
-            <Button
-                android:id="@+id/fullbody_category_button"
-                style="@style/MyButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Full Body"
-                android:textColor="#fff"
-                android:background="@drawable/button_gradient"
-                android:layout_marginEnd="8dp" />
-
-            <Button
-                android:id="@+id/cardio_category_button"
-                style="@style/MyButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cardio"
-                android:textColor="#fff"
                 android:background="@drawable/button_gradient" />
+
         </LinearLayout>
     </HorizontalScrollView>
 
