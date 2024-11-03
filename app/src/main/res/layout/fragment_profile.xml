@@ -46,20 +46,21 @@
         android:paddingBottom="24dp" />
 
     <!-- Button for Editing Profile -->
+
+    <!-- Button for Changing Password -->
     <Button
         android:id="@+id/edit_profile"
         style="@style/MyButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Edit Profile"
-        android:textSize="16sp"
-        android:textColor="#fff"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/button_gradient"
         android:padding="5dp"
-        android:layout_marginBottom="16dp"
+        android:text="Edit Profile"
+        android:textColor="#fff"
+        android:textSize="16sp"
         app:cornerRadius="10dp" />
 
-    <!-- Button for Changing Password -->
     <Button
         android:id="@+id/change_password"
         style="@style/MyButton"

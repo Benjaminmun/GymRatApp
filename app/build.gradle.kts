@@ -40,6 +40,11 @@ android {
     buildToolsVersion = "34.0.0"
 }
 
+repositories {
+    maven { url = uri("https://jitpack.io") }
+}
+
+
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation("com.google.firebase:firebase-analytics")
@@ -52,11 +57,14 @@ dependencies {
     implementation ("androidx.room:room-runtime:2.5.2")
     annotationProcessor ("androidx.room:room-compiler:2.5.2")
     implementation ("androidx.room:room-ktx:2.5.2")
-    
 
     implementation("com.google.android.material:material:1.9.0")
 
     implementation ("com.github.bumptech.glide:glide:4.15.1")
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation ("com.github.AnyChart:AnyChart-Android:1.1.3")
+
+
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
 
     implementation(libs.appcompat)

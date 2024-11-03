@@ -56,6 +56,7 @@
         <activity android:name=".AddExerciseActivity" />
         <activity android:name=".TrainingDetailActivity" />
         <activity android:name=".EditUserTrainingActivity" />
+        <activity android:name=".ProperEditUserTrainingActivity" />
         <activity android:name=".StartWorkoutActivity" />
 
 
