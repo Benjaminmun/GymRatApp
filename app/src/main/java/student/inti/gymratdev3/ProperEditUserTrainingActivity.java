@@ -7,6 +7,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.*;
+import android.content.Intent;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,9 +19,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class EditUserTrainingActivity extends AppCompatActivity {
+public class ProperEditUserTrainingActivity extends AppCompatActivity {
 
     private EditText trainingNameEditText;
     private LinearLayout exercisesContainer;
@@ -31,15 +34,15 @@ public class EditUserTrainingActivity extends AppCompatActivity {
     private FirebaseUser currentUser;
     private ProgressDialog progressDialog;
 
-    // Store default and custom exercises
     private ArrayList<String> availableExercises = new ArrayList<>();
+    private String trainingId;  // Store the training ID for editing
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_user_training);
 
-        // Change status bar color to match button color
+        // Status bar color and initialization
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             getWindow().setStatusBarColor(android.graphics.Color.parseColor("#3100d4"));
@@ -61,7 +64,15 @@ public class EditUserTrainingActivity extends AppCompatActivity {
         progressDialog.setCancelable(false);
 
         // Load available exercises (both default and custom)
-        loadAvailableExercises();
+        loadAvailableExercises(() -> {
+            trainingId = getIntent().getStringExtra("TRAINING_ID");
+            if (trainingId != null) {
+                loadTrainingData(trainingId);  // Load data for editing only after exercises are loaded
+            } else {
+                Toast.makeText(this, "Training ID not provided", Toast.LENGTH_SHORT).show();
+                finish();  // End activity if no ID is provided
+            }
+        });
 
         // Handle Add Exercise button click
         addExerciseButton.setOnClickListener(v -> {
@@ -72,18 +83,48 @@ public class EditUserTrainingActivity extends AppCompatActivity {
             }
         });
 
-        // Save button listener with delayed trigger to capture latest input
+        // Save button listener
         saveTrainingButton.setOnClickListener(v -> {
             trainingNameEditText.clearFocus();  // Ensure input is captured
             saveTrainingButton.postDelayed(this::saveTrainingToFirestore, 50);
         });
+
     }
 
-    // Load available exercises from Firestore (default workouts + user custom exercises)
-    private void loadAvailableExercises() {
-        availableExercises.clear(); // Clear previous data to avoid duplication
+    private void addExerciseField() {
+        // Define this method as required, for example, by calling an overloaded version or adding blank inputs.
+        addExerciseField("", 0, 0);  // This adds a blank exercise with default values
+    }
 
-        // Load default workouts from Firestore's `default_workouts` collection
+    // Load data for editing from Firestore using training ID
+    private void loadTrainingData(String trainingId) {
+        db.collection("trainings").document(trainingId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String trainingName = documentSnapshot.getString("trainingName");
+                        trainingNameEditText.setText(trainingName);
+
+                        List<Map<String, Object>> exercises = (List<Map<String, Object>>) documentSnapshot.get("exercises");
+                        if (exercises != null) {
+                            for (Map<String, Object> exerciseData : exercises) {
+                                String name = (String) exerciseData.get("exercise");
+                                int reps = ((Number) exerciseData.get("reps")).intValue();
+                                int sets = ((Number) exerciseData.get("sets")).intValue();
+                                addExerciseField(name, reps, sets);
+                            }
+                        }
+                    } else {
+                        Toast.makeText(this, "Training not found", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load training data", Toast.LENGTH_SHORT).show());
+    }
+
+    // Load available exercises and then execute a callback when done
+    private void loadAvailableExercises(Runnable onComplete) {
+        availableExercises.clear();
+
         db.collection("default_workouts")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -94,16 +135,15 @@ public class EditUserTrainingActivity extends AppCompatActivity {
                                 availableExercises.add(exerciseName);
                             }
                         }
-                        // After loading default workouts, load custom exercises
-                        loadCustomExercises();
+                        loadCustomExercises(onComplete); // After default, load custom exercises
                     } else {
                         Toast.makeText(this, "Failed to load default workouts.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    // Load user custom exercises from Firestore
-    private void loadCustomExercises() {
+    // Load user custom exercises and then call the callback
+    private void loadCustomExercises(Runnable onComplete) {
         if (currentUser != null) {
             db.collection("users").document(currentUser.getUid()).collection("custom_exercises")
                     .get()
@@ -115,6 +155,7 @@ public class EditUserTrainingActivity extends AppCompatActivity {
                                     availableExercises.add(exerciseName);
                                 }
                             }
+                            if (onComplete != null) onComplete.run(); // Run callback after loading
                         } else {
                             Toast.makeText(this, "Failed to load custom exercises.", Toast.LENGTH_SHORT).show();
                         }
@@ -122,22 +163,61 @@ public class EditUserTrainingActivity extends AppCompatActivity {
         }
     }
 
-    // Add a new exercise input field with a dropdown Spinner for exercise selection
-    private void addExerciseField() {
+    // Overloaded method to add an exercise field with data
+    private void addExerciseField(String name, int reps, int sets) {
         LinearLayout exerciseLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.exercise_input_layout, null);
-
         Spinner exerciseSpinner = exerciseLayout.findViewById(R.id.exercise_spinner);
         EditText repsEditText = exerciseLayout.findViewById(R.id.reps_edit_text);
         EditText setsEditText = exerciseLayout.findViewById(R.id.sets_edit_text);
         ImageButton deleteExerciseButton = exerciseLayout.findViewById(R.id.delete_exercise_button);
 
-        // Set up the exercise spinner with the available exercises
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, availableExercises);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        exerciseSpinner.setAdapter(adapter);
+        // Set up the spinner adapter
+        setupExerciseSpinner(exerciseSpinner);
 
-        // Add validation for reps and sets input fields
-        validateRepsAndSets(repsEditText, setsEditText);
+        // Set the selected exercise after adapter is set
+        int exerciseIndex = availableExercises.indexOf(name);
+        if (exerciseIndex >= 0) {
+            exerciseSpinner.setSelection(exerciseIndex);
+        }
+
+        repsEditText.setText(String.valueOf(reps));
+        setsEditText.setText(String.valueOf(sets));
+
+        // Real-time validation directly for repsEditText
+        repsEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() == 0) {
+                    repsEditText.setError("Reps cannot be empty");
+                } else if (s.toString().equals("0")) {
+                    repsEditText.setError("Reps cannot be 0");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        // Real-time validation directly for setsEditText
+        setsEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() == 0) {
+                    setsEditText.setError("Sets cannot be empty");
+                } else if (s.toString().equals("0")) {
+                    setsEditText.setError("Sets cannot be 0");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         // Set up delete button to remove exercise layout
         deleteExerciseButton.setOnClickListener(v -> {
@@ -145,11 +225,17 @@ public class EditUserTrainingActivity extends AppCompatActivity {
             exerciseCount--;
         });
 
-        // Add the new exercise layout to the container
         exercisesContainer.addView(exerciseLayout);
         exerciseCount++;
     }
 
+
+    // Set up exercise spinner for loading exercise options
+    private void setupExerciseSpinner(Spinner spinner) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, availableExercises);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
 
     // Real-time validation for reps and sets input
     private void validateRepsAndSets(EditText repsEditText, EditText setsEditText) {
@@ -196,7 +282,7 @@ public class EditUserTrainingActivity extends AppCompatActivity {
             return;
         }
 
-        // Trim the input to avoid issues with whitespace
+        // Trim input to avoid whitespace issues
         String trainingName = trainingNameEditText.getText().toString().trim();
         if (trainingName.isEmpty()) {
             Toast.makeText(this, "Training name cannot be empty", Toast.LENGTH_SHORT).show();
@@ -232,16 +318,23 @@ public class EditUserTrainingActivity extends AppCompatActivity {
             return;
         }
 
+        // Prepare the training data for saving
         Map<String, Object> trainingData = new HashMap<>();
         trainingData.put("userId", currentUser.getUid());
         trainingData.put("trainingName", trainingName);
         trainingData.put("exercises", exercises);
 
         progressDialog.show();
-        db.collection("trainings").add(trainingData)
-                .addOnSuccessListener(documentReference -> {
+
+        // Update the existing document with the trainingId rather than adding a new one
+        db.collection("trainings").document(trainingId)
+                .set(trainingData)
+                .addOnSuccessListener(aVoid -> {
                     progressDialog.dismiss();
                     Toast.makeText(this, "Training saved successfully", Toast.LENGTH_SHORT).show();
+
+                    // Set result before finishing activity
+                    setResult(RESULT_OK);
                     finish();
                 })
                 .addOnFailureListener(e -> {
@@ -249,6 +342,7 @@ public class EditUserTrainingActivity extends AppCompatActivity {
                     Toast.makeText(this, "Error saving training", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     @Override
     public void onBackPressed() {
@@ -258,4 +352,6 @@ public class EditUserTrainingActivity extends AppCompatActivity {
                 .setNegativeButton("No", (dialog, which) -> super.onBackPressed())
                 .show();
     }
+
+
 }

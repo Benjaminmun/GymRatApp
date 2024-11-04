@@ -38,7 +38,9 @@
             android:layout_height="wrap_content"
             android:inputType="number"
             android:textColor="#3100d4"
-            android:gravity="center" />
+            android:gravity="center"
+            android:enabled="false"
+            />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Sets Field -->
@@ -57,7 +59,8 @@
             android:inputType="number"
             android:textColorHint="#978cbd"
             android:textColor="#3100d4"
-            android:gravity="center" />
+            android:gravity="center"
+            android:enabled="false"/>
     </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

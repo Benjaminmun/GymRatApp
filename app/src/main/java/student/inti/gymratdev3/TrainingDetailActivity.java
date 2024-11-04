@@ -1,16 +1,13 @@
 package student.inti.gymratdev3;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.*;
@@ -22,20 +19,18 @@ public class TrainingDetailActivity extends AppCompatActivity {
     private static final String TAG = "TrainingDetailActivity";
 
     private LinearLayout exercisesLayout;
-    private Button addExerciseButton, removeExerciseButton, startWorkoutButton;
+    private Button addExerciseButton, startWorkoutButton;
     private ProgressBar progressBar;
 
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
     private String trainingId;
 
-    private Handler saveHandler = new Handler();
-    private Runnable saveRunnable;
-
     private final List<View> exerciseViews = new ArrayList<>();
     private final List<String> availableExercises = new ArrayList<>();
 
     private boolean isDataChanged = false; // Track if user has made changes
+    private static final int REQUEST_CODE_EDIT_TRAINING = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,17 +48,11 @@ public class TrainingDetailActivity extends AppCompatActivity {
         loadAvailableExercises();
         loadExercises();
 
-        updateRemoveButtonState();
-
         // Set listeners
         addExerciseButton.setOnClickListener(v -> {
-            addExerciseField();
-            isDataChanged = true; // Mark as changed when user adds an exercise
-        });
-
-        removeExerciseButton.setOnClickListener(v -> {
-            removeLastExercise();
-            isDataChanged = true; // Mark as changed when user removes an exercise
+            Intent intent = new Intent(TrainingDetailActivity.this, ProperEditUserTrainingActivity.class);
+            intent.putExtra("TRAINING_ID", trainingId);
+            startActivityForResult(intent, REQUEST_CODE_EDIT_TRAINING);  // Navigate to ProperEditUserTrainingActivity
         });
 
         startWorkoutButton.setOnClickListener(v -> {
@@ -77,13 +66,9 @@ public class TrainingDetailActivity extends AppCompatActivity {
         });
     }
 
-
-
-
     private void initializeUI() {
         exercisesLayout = findViewById(R.id.exercises_layout);
         addExerciseButton = findViewById(R.id.add_exercise_button);
-        removeExerciseButton = findViewById(R.id.remove_exercise_button);
         startWorkoutButton = findViewById(R.id.start_workout_button);
         progressBar = findViewById(R.id.progress_bar);
 
@@ -99,6 +84,19 @@ public class TrainingDetailActivity extends AppCompatActivity {
         if (trainingId == null) {
             showError("Invalid training ID.");
             finish();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_EDIT_TRAINING && resultCode == RESULT_OK) {
+            // Restart TrainingDetailActivity to refresh data
+            Log.d(TAG, "Training data was updated. Restarting TrainingDetailActivity...");
+            Intent intent = getIntent();
+            finish();
+            startActivity(intent);
         }
     }
 
@@ -127,9 +125,7 @@ public class TrainingDetailActivity extends AppCompatActivity {
             int sets = ((Number) exercise.get("sets")).intValue();
             addExerciseView(name, reps, sets);
         }
-        updateRemoveButtonState();
     }
-
 
     private void addExerciseView(String name, int reps, int sets) {
         View exerciseView = LayoutInflater.from(this)
@@ -143,57 +139,8 @@ public class TrainingDetailActivity extends AppCompatActivity {
         repsEditText.setText(String.valueOf(reps));
         setsEditText.setText(String.valueOf(sets));
 
-        // Monitor changes in reps or sets to mark the data as changed
-        repsEditText.addTextChangedListener(createTextWatcher());
-        setsEditText.addTextChangedListener(createTextWatcher());
-
         exercisesLayout.addView(exerciseView);
         exerciseViews.add(exerciseView);
-        updateRemoveButtonState();
-    }
-
-    private void addExerciseField() {
-        View exerciseLayout = getLayoutInflater()
-                .inflate(R.layout.exercise_input_training_details_added, exercisesLayout, false);
-
-        Spinner exerciseSpinner = exerciseLayout.findViewById(R.id.exercise_spinner);
-        EditText repsEditText = exerciseLayout.findViewById(R.id.reps_edit_text);
-        EditText setsEditText = exerciseLayout.findViewById(R.id.sets_edit_text);
-
-        setupExerciseSpinner(exerciseSpinner);
-
-        // Monitor changes in reps or sets to mark the data as changed
-        repsEditText.addTextChangedListener(createTextWatcher());
-        setsEditText.addTextChangedListener(createTextWatcher());
-
-        exercisesLayout.addView(exerciseLayout);
-        exerciseViews.add(exerciseLayout);
-        updateRemoveButtonState();
-
-        isDataChanged = true; // Mark data as changed when user adds an exercise
-        scheduleSave();
-        Log.d(TAG, "Added new exercise field.");
-    }
-
-
-    private void removeLastExercise() {
-        if (exerciseViews.size() > 1) {
-            View lastExercise = exerciseViews.remove(exerciseViews.size() - 1);
-            exercisesLayout.removeView(lastExercise);
-            isDataChanged = true; // Mark data as changed when user removes an exercise
-            scheduleSave();
-            updateRemoveButtonState(); // Add this line
-        } else {
-            showError("Cannot remove the last exercise.");
-        }
-    }
-
-
-    private void setupExerciseSpinner(Spinner spinner) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, availableExercises);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
     }
 
     private void loadAvailableExercises() {
@@ -211,7 +158,7 @@ public class TrainingDetailActivity extends AppCompatActivity {
     }
 
     private void saveAndNavigateToWorkout() {
-        saveExercises(() -> navigateToWorkout());
+        saveExercises(this::navigateToWorkout);
     }
 
     private void saveExercises(Runnable onSuccess) {
@@ -270,7 +217,6 @@ public class TrainingDetailActivity extends AppCompatActivity {
                 });
     }
 
-
     private void navigateToWorkout() {
         Intent intent = new Intent(this, StartWorkoutActivity.class);
         intent.putExtra("TRAINING_ID", trainingId);
@@ -281,42 +227,4 @@ public class TrainingDetailActivity extends AppCompatActivity {
     private void showError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
-
-    // Helper method to track changes in EditText fields
-    private TextWatcher createTextWatcher() {
-        return new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                isDataChanged = true; // Mark data as changed if user edits text
-                // Remove any pending saves
-                saveHandler.removeCallbacks(saveRunnable);
-                // Schedule a new save after a delay
-                saveRunnable = () -> saveExercises(null);
-                saveHandler.postDelayed(saveRunnable, 2000); // Save after 2 seconds of inactivity
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        };
-    }
-
-    private void scheduleSave() {
-        // Remove any pending saves
-        saveHandler.removeCallbacks(saveRunnable);
-        // Schedule a new save after a delay
-        saveRunnable = () -> saveExercises(null);
-        saveHandler.postDelayed(saveRunnable, 2000); // Save after 2 seconds
-    }
-
-    private void updateRemoveButtonState() {
-        if (exerciseViews.size() <= 1) {
-            removeExerciseButton.setEnabled(false);
-        } else {
-            removeExerciseButton.setEnabled(true);
-        }
-    }
-
 }
