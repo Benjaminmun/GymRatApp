@@ -47,7 +47,6 @@ public class ReportFragment extends Fragment {
         // Initialize Firestore and UI elements
         db = FirebaseFirestore.getInstance();
         workoutHistoryRecycler = view.findViewById(R.id.workout_history_recycler);
-        refreshButton = view.findViewById(R.id.refresh_button);
         totalMinutesTextView = view.findViewById(R.id.total_minutes_text_view); // New
         totalExercisesTextView = view.findViewById(R.id.total_exercises_text_view); // New
 
@@ -59,8 +58,6 @@ public class ReportFragment extends Fragment {
         // Load data on fragment start
         loadWorkoutHistory();
 
-        // Refresh button click listener
-        refreshButton.setOnClickListener(v -> loadWorkoutHistory());
 
         return view;
     }

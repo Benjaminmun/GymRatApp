@@ -30,7 +30,9 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiresApi(api = Build.VERSION_CODES.R)
 public class TrainingFragment extends Fragment {
@@ -45,8 +47,6 @@ public class TrainingFragment extends Fragment {
 
     // ListenerRegistration to manage Firestore listener
     private ListenerRegistration trainingsListenerRegistration;
-
-    private final List<String> defaultTrainings = List.of("Full Body Workout", "Cardio Burn", "Strength Training");
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,8 +65,8 @@ public class TrainingFragment extends Fragment {
         // Set up search functionality
         setupSearchFunctionality(rootView);
 
-        // Add default trainings
-        addDefaultTrainings();
+//        // Add default trainings that will be visible to every user
+//        addDefaultTrainings();
 
         // Add listener to the "Add Training" button
         addTrainingButton.setOnClickListener(v -> navigateToEditUserTraining());
@@ -114,12 +114,51 @@ public class TrainingFragment extends Fragment {
             }
         });
     }
+//
+//    private void addDefaultTrainings() {
+//        // Get each workout plan from DefaultTrainingData
+//        List<Map<String, Object>> fullBodyWorkout = DefaultTrainingData.getFullBodyWorkout();
+//        List<Map<String, Object>> cardioBurn = DefaultTrainingData.getCardioBurn();
+//        List<Map<String, Object>> strengthTraining = DefaultTrainingData.getStrengthTraining();
+//
+//        // Add each default training plan as a button and link its exercises
+//        addDefaultTrainingButtonToContainer("Full Body Workout", fullBodyWorkout);
+//        addDefaultTrainingButtonToContainer("Cardio Burn", cardioBurn);
+//        addDefaultTrainingButtonToContainer("Strength Training", strengthTraining);
+//    }
+//
+//
+//
+//    private void addDefaultTrainingButtonToContainer(String trainingName, List<Map<String, Object>> exercises) {
+//        if (!isAdded()) {
+//            Log.w("TrainingFragment", "Fragment not attached. Skipping adding default training button.");
+//            return;
+//        }
+//
+//        View trainingView = LayoutInflater.from(getContext()).inflate(R.layout.default_training_button_layout, null);
+//        Button trainingButton = trainingView.findViewById(R.id.training_button);
+//        ImageButton removeButton = trainingView.findViewById(R.id.remove_button);
+//
+//        trainingButton.setText(trainingName);
+//        trainingButton.setBackgroundResource(R.drawable.button_gradient_alternate);
+//        trainingButton.setTextColor(getResources().getColor(android.R.color.white));
+//        trainingButton.setPadding(16, 16, 16, 16);
+//
+//        // Navigate to the detail activity and pass exercises as extra data
+//        trainingButton.setOnClickListener(v -> {
+//            Intent intent = new Intent(getContext(), TrainingDetailActivity.class);
+//            intent.putExtra("TRAINING_NAME", trainingName);
+//            intent.putExtra("EXERCISES", new ArrayList<>(exercises)); // Pass exercises list
+//            startActivity(intent);
+//        });
+//
+//        removeButton.setVisibility(View.GONE);  // Hide the remove button for default training
+//
+//        trainingContainer.addView(trainingView);
+//        allTrainingViews.add(trainingView);
+//    }
 
-    private void addDefaultTrainings() {
-        for (String training : defaultTrainings) {
-            addDefaultTrainingButtonToContainer(training);
-        }
-    }
+
 
     private void loadUserTrainings() {
         if (currentUser == null) {
@@ -168,30 +207,6 @@ public class TrainingFragment extends Fragment {
             }
         }
         allTrainingViews.removeAll(viewsToRemove);
-    }
-
-    private void addDefaultTrainingButtonToContainer(String trainingName) {
-        if (!isAdded()) {
-            Log.w("TrainingFragment", "Fragment not attached. Skipping adding default training button.");
-            return;
-        }
-
-        View trainingView = LayoutInflater.from(getContext()).inflate(R.layout.default_training_button_layout, null);
-        Button trainingButton = trainingView.findViewById(R.id.training_button);
-        ImageButton removeButton = trainingView.findViewById(R.id.remove_button);
-
-        trainingButton.setText(trainingName);
-        trainingButton.setBackgroundResource(R.drawable.button_gradient_alternate);
-        trainingButton.setTextColor(getResources().getColor(android.R.color.white));
-        trainingButton.setPadding(16, 16, 16, 16);
-
-        // Navigate to the detail activity without trainingId
-        trainingButton.setOnClickListener(v -> navigateToTrainingDetail(null));
-
-        removeButton.setVisibility(View.GONE);
-
-        trainingContainer.addView(trainingView);
-        allTrainingViews.add(trainingView);
     }
 
     private void addUserTrainingButtonToContainer(String trainingName, String trainingId) {
@@ -276,3 +291,4 @@ public class TrainingFragment extends Fragment {
         }
     }
 }
+
